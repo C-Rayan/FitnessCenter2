@@ -11,7 +11,7 @@ public class Main {
         Member alien = new Member();
         alien.setName("Jamal");
         alien.setEmail("Jamal@gmail.com");
-        //Testing commit work?
+        //Testing commit work? a
 
         Configuration config = new Configuration();
         config.addAnnotatedClass(org.example.Member.class);
