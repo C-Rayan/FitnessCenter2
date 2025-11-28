@@ -3,34 +3,34 @@ package org.example;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Date;
+
 @Entity
-public class Member {
+public class Member extends Person {
     @Id
     private int aid;
-    private String name;
-    private String email;
+    private Date dateOfBirth;
+    private ArrayList<FitnessGoal> goals;
+    private ArrayList<HealthMetric> metrics;
 
-    public String getName() {
-        return name;
+    public  Member(String email, String name, String gender, Date date, HealthMetric metric){
+        super(email, name, gender);
+        dateOfBirth = date;
+        metrics.add(metric);
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public int getAid() {
+        return aid;
     }
 
-    public String getEmail() {
-        return email;
+    public Date getDateOfBirth() {
+        return dateOfBirth;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    @Override
-    public String toString() {
-        return "Member{" +
-                "name='" + name + '\'' +
-                ", email='" + email + '\'' +
-                '}';
+    public void addNewGoal(FitnessGoal goal){
+        if(!goals.contains(goal))
+            goals.add(goal);
     }
 }

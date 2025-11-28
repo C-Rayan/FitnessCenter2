@@ -8,9 +8,9 @@ import org.hibernate.cfg.Configuration;
 
 public class Main {
     public static void main(String[] args){
-        Member alien = new Member();
-        alien.setName("Jamal");
-        alien.setEmail("Jamal@gmail.com");
+        //Member alien = new Member();
+        //alien.setName("Jamal");
+        //alien.setEmail("Jamal@gmail.com");
         //Testing commit work? a
 
         Configuration config = new Configuration();
