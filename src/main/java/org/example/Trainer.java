@@ -1,27 +1,25 @@
 package org.example;
 
-import jakarta.persistence.*;
-import org.hibernate.annotations.Check;
-
-import java.util.Date;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
 
 @Entity
-@Check(constraints = "pass >= 1000 AND pass <= 9999")
-public class Member {
+public class Trainer {
     @Id
     @Column(unique = true, nullable = false)
     private String email;
     private String name;
-    private String gender;
-    private String dateOfBirth;
-    @Column(nullable = false)
     private int pass;
 
-    public Member(String email, String name, int pass) {
+    public Trainer(String email, String name, int pass) {
         this.email = email;
         this.name = name;
         this.pass = pass;
     }
+
+    public Trainer(){}
 
     public String getName() {
         return name;
@@ -56,5 +54,4 @@ public class Member {
             return true;
         return false;
     }
-
 }
