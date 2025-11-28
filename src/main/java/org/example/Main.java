@@ -17,7 +17,7 @@ public class Main {
         config.addAnnotatedClass(org.example.Trainer.class);
         config.configure("hibernate.cfg.xml");
 
-        // Begin a transaction, where changes will occur in the database
+        // Begin a transaction, where changes will occur in the database//
         SessionFactory sf = config.buildSessionFactory();
         Session session = sf.openSession();
         Transaction transaction = session.beginTransaction();
