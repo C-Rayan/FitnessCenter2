@@ -17,7 +17,16 @@ public class FitnessGoal {
         return title;
     }
 
-    public  void update(double num){
-        progress += num;
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setProgress(double progress) {
+        this.progress = progress;
+    }
+
+    @Override
+    public String toString() {
+        return "Title: "+ title +"\tProgress"+ progress;
     }
 }
