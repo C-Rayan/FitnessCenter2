@@ -34,7 +34,7 @@ public class Member  {
     }
 
     private ArrayList<HealthMetric> metrics;
-
+    public Member(){}
     public Member(String email, String name, String gender, LocalDate date, int pass){
         this.email = email;
         this.name = name;
@@ -72,4 +72,18 @@ public class Member  {
     public String getName() {
         return name;
     }
+
+    public void setName(String newName) {
+        this.name = newName;
+    }
+
+    public void setEmail(String newEmail) {
+        this.email = newEmail;
+    }
+
+    public void setGender(String newGender){
+        this.gender = newGender;
+    }
+
+
 }

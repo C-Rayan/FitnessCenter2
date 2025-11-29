@@ -109,7 +109,6 @@ public class RegistrationView extends JPanel{
                     Transaction transac = session.beginTransaction();
                     session.persist(newMember);
                     transac.commit();
-                    label.setText("YOUR ACCOUNT WAS CREATED SUCCESFULLY");
                     this.setVisible(false);
                     // Can get the login Frame using this
                     myPanel.setVisible(true);

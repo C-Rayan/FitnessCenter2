@@ -98,7 +98,7 @@ public class LoginView extends JFrame  {
                 checkLogin.isComplete();
                 if (userType.equals("Member")){
                     loginFrame.dispose();
-                    new ProfileView(checkMember);
+                    new ProfileView(checkMember, session);
                 }
             }
             else {
