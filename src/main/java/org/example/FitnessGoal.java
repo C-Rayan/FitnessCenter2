@@ -27,6 +27,6 @@ public class FitnessGoal {
 
     @Override
     public String toString() {
-        return "Title: "+ title +"\tProgress"+ progress;
+        return "Title: "+ title +"\t"+" Progress: "+ progress;
     }
 }
