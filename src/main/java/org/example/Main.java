@@ -37,8 +37,6 @@ public class Main {
         FitnessGoal goal = new FitnessGoal("Gym", 20);
 
         p1.addNewGoal(goal);
-        //Profile profile = new Profile(p1);
-        //profile.getFrame().setVisible(true);
         new ProfileView(p1);
 
     }
