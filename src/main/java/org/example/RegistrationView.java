@@ -8,7 +8,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.Date;
 
 // A child of JPanel, so that it can be added to the main frame
 public class RegistrationView extends JPanel{
@@ -84,17 +89,23 @@ public class RegistrationView extends JPanel{
             String firstNameValue = firstName.getText();
             String lastNameValue = lastName.getText();
             String emailofMe = email.getText();
-            String DOF = dateOfBirth.getText();
+            String gender = (String) genders.getSelectedItem();
             int pin = 0;
             if (!pass.getText().isBlank())
-                pin = Integer.parseInt(pass.getText());
+                try{
+                    pin = Integer.parseInt(pass.getText());
+                } catch (NumberFormatException ex) {
+                    label.setText("You did not input a correct pin");
+                }
+
 
             try{
-                if (firstNameValue.isBlank() || lastNameValue.isBlank() || emailofMe.isBlank() || DOF.isBlank() || pass.getText().isBlank()){
+                if (firstNameValue.isBlank() || lastNameValue.isBlank() || emailofMe.isBlank() || dateOfBirth.getText().isBlank() || pass.getText().isBlank()){
                     label.setText("You left something blank, please fill all the details");
                 }
                 else {
-                    Member newMember = new Member(emailofMe, (firstNameValue + lastNameValue), pin);
+                    LocalDate DOF = LocalDate.parse(dateOfBirth.getText(), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+                    Member newMember = new Member(emailofMe, (firstNameValue + lastNameValue), gender, DOF, pin);
                     Transaction transac = session.beginTransaction();
                     session.persist(newMember);
                     transac.commit();
@@ -112,6 +123,9 @@ public class RegistrationView extends JPanel{
                 System.out.println("Your pin was too long or too short, please try again");
                 label.setText("Your pin was too long or too short, please try again");
 
+            }
+            catch (DateTimeParseException d){
+                label.setText("You wrote the date in the inccorect format");
             }
         });
 

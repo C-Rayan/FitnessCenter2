@@ -86,16 +86,20 @@ public class LoginView extends JFrame  {
             boolean loggedIn = false;
             String userType = "";
             // Check if any user with those details exists
-            if (checkMember != null)
-                loggedIn = checkMember.checkLogIn(String.valueOf(putPass.getText())); userType = "Member";
-            if (checkTrainer != null)
-                loggedIn = checkTrainer.checkLogIn(String.valueOf(putPass.getText())); userType = "Trainer";
-            if (checkAdmin != null)
-                loggedIn = checkAdmin.checkLogIn(String.valueOf(putPass.getText())); userType = "Admin";
+            if (checkMember != null){
+                loggedIn = checkMember.checkLogIn(String.valueOf(putPass.getText())); userType = "Member";}
+            if (checkTrainer != null){
+                loggedIn = checkTrainer.checkLogIn(String.valueOf(putPass.getText())); userType = "Trainer";}
+            if (checkAdmin != null){
+                loggedIn = checkAdmin.checkLogIn(String.valueOf(putPass.getText())); userType = "Admin";}
 
             // Close transaction
             if (loggedIn){
                 checkLogin.isComplete();
+                if (userType.equals("Member")){
+                    loginFrame.dispose();
+                    new ProfileView(checkMember);
+                }
             }
             else {
                 JLabel warning = new JLabel();

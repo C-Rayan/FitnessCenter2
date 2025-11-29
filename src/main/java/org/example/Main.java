@@ -21,7 +21,7 @@ public class Main {
         Session session = sf.openSession();
         LoginView view = new LoginView(session);
 
-        Member p1 = new Member("bob@gmail.con", "Bob", "Male", LocalDate.now());
+        Member p1 = new Member("bob@gmail.con", "Bob", "Male", LocalDate.now(), 1000);
         HealthMetric m1 = new HealthMetric("bob@gmail.con", "1", LocalDate.now(), 150,180, 69);
         HealthMetric m2 = new HealthMetric("bob@gmail.con", "2", LocalDate.now(), 150,180, 70);
         HealthMetric m3 = new HealthMetric("bob@gmail.con", "2", LocalDate.now(), 150,180, 72);
@@ -30,7 +30,7 @@ public class Main {
         p1.addNewGoal(goal);
         //Profile profile = new Profile(p1);
         //profile.getFrame().setVisible(true);
-        new ProfileView(p1);
+        //new ProfileView(p1);
 
     }
 }

@@ -1,5 +1,6 @@
 package org.example;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -7,6 +8,7 @@ import jakarta.persistence.Id;
 @Entity
 public class Admin {
     @Id
+    @Column(unique = true, nullable = false)
     private String email;
     private String name;
     private int pass;
