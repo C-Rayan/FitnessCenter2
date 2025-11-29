@@ -5,50 +5,39 @@ import org.hibernate.annotations.Check;
 
 import java.util.Date;
 
+import java.lang.reflect.Array;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Date;
+
 @Entity
-@Check(constraints = "pass >= 1000 AND pass <= 9999")
-public class Member {
-    @Id
-    @Column(unique = true, nullable = false)
-    private String email;
-    private String name;
-    private String gender;
-    private String dateOfBirth;
-    @Column(nullable = false)
-    private int pass;
+public class Member extends Person {
+    private LocalDate dateOfBirth;
+    private ArrayList<FitnessGoal> goals;
+    private ArrayList<HealthMetric> metrics;
 
-    public Member(String email, String name, int pass) {
-        this.email = email;
-        this.name = name;
-        this.pass = pass;
+    public  Member(String email, String name, String gender, LocalDate date){
+        super(email, name, gender);
+        goals = new ArrayList<>();
+        metrics = new ArrayList<>();
+        dateOfBirth = date;
     }
 
-    public String getName() {
-        return name;
+    public LocalDate getDateOfBirth() {
+        return dateOfBirth;
     }
 
-    public int getPass() {
-        return pass;
+    public ArrayList<FitnessGoal> getGoals() {
+        return goals;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public ArrayList<HealthMetric> getMetrics() {
+        return metrics;
     }
 
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    @Override
-    public String toString() {
-        return "Member{" +
-                "name='" + name + '\'' +
-                ", email='" + email + '\'' +
-                '}';
+    public void addNewGoal(FitnessGoal goal){
+        if(!goals.contains(goal))
+            goals.add(goal);
     }
 
     public boolean checkLogIn(String pass) {
