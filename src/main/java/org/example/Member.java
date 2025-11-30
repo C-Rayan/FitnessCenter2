@@ -1,14 +1,10 @@
 package org.example;
 
 import jakarta.persistence.*;
-import org.hibernate.annotations.Check;
 
-import java.util.Date;
-
-import java.lang.reflect.Array;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.List;
 
 @Entity
 public class Member  {
@@ -19,7 +15,34 @@ public class Member  {
     private String gender;
     private int pass;
     private LocalDate dateOfBirth;
-    private ArrayList<FitnessGoal> goals;
+    private int numEntry = 0;
+
+    private int numGoals = 0;
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    private List<HealthMetric> metrics;
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    private List<FitnessGoal> goals;
+
+    public int getNumGoals() {
+        return numGoals;
+    }
+
+    public void setNumGoals(int numGoals) {
+        this.numGoals = numGoals;
+    }
+
+    public void setNumEntry(int numEntry) {
+        this.numEntry = numEntry;
+    }
+
+    public int getNumEntry() {
+        return numEntry;
+    }
+
+
+
 
     public String getEmail() {
         return email;
@@ -32,8 +55,6 @@ public class Member  {
     public int getPass() {
         return pass;
     }
-
-    private ArrayList<HealthMetric> metrics;
     public Member(){}
     public Member(String email, String name, String gender, LocalDate date, int pass){
         this.email = email;
@@ -50,17 +71,22 @@ public class Member  {
         return dateOfBirth;
     }
 
-    public ArrayList<FitnessGoal> getGoals() {
+    public List<FitnessGoal> getGoals() {
         return goals;
     }
 
-    public ArrayList<HealthMetric> getMetrics() {
+    public List<HealthMetric> getMetrics() {
         return metrics;
     }
 
     public void addNewGoal(FitnessGoal goal){
         if(!goals.contains(goal))
             goals.add(goal);
+    }
+
+    public void addMetric(HealthMetric metric){
+        this.metrics.add(metric);
+
     }
 
     public boolean checkLogIn(String pass) {

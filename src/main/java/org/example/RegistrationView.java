@@ -3,6 +3,7 @@ package org.example;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
+import javax.crypto.spec.RC2ParameterSpec;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -14,6 +15,8 @@ import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.regex.Pattern;
+
 
 // A child of JPanel, so that it can be added to the main frame
 public class RegistrationView extends JPanel{
@@ -26,16 +29,16 @@ public class RegistrationView extends JPanel{
 
         this.setLayout(null);
         this.add(label);
-        JLabel label2 = new JLabel("Enter date of birth here");
+        JLabel label2 = new JLabel("Enter date of birth (yyyy-MM-dd)");
         label2.setBounds(100, 150, 200, 30);
         this.add(label2);
-        JLabel label3 = new JLabel("Enter first name here");
+        JLabel label3 = new JLabel("Enter first name");
         label3.setBounds(100, 50, 200, 30);
         this.add(label3);
-        JLabel label4 = new JLabel("Enter last name here");
+        JLabel label4 = new JLabel("Enter last name");
         label4.setBounds(100, 100, 200, 30);
         this.add(label4);
-        JLabel label5 = new JLabel("Enter your email here");
+        JLabel label5 = new JLabel("Enter your email");
         label5.setBounds(100, 200, 200, 30);
         this.add(label5);
         JLabel label6 = new JLabel("Enter your pin (4 numbers)");
@@ -103,6 +106,12 @@ public class RegistrationView extends JPanel{
                 if (firstNameValue.isBlank() || lastNameValue.isBlank() || emailofMe.isBlank() || dateOfBirth.getText().isBlank() || pass.getText().isBlank()){
                     label.setText("You left something blank, please fill all the details");
                 }
+                else if (!(firstNameValue.length() > 2) || !(lastNameValue.length() > 2)){
+                    label.setText("Your name is too short");
+                }
+                else if (!emailofMe.contains("@") || !emailofMe.contains(".")){
+                    label.setText("Your email is incorrect");
+                }
                 else {
                     LocalDate DOF = LocalDate.parse(dateOfBirth.getText(), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
                     Member newMember = new Member(emailofMe, (firstNameValue + lastNameValue), gender, DOF, pin);
@@ -124,7 +133,7 @@ public class RegistrationView extends JPanel{
 
             }
             catch (DateTimeParseException d){
-                label.setText("You wrote the date in the inccorect format");
+                label.setText("You wrote the date in the inccorect format (yyyy-MM-dd)");
             }
         });
 

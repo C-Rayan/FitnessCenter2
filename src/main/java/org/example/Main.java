@@ -14,6 +14,8 @@ public class Main {
         config.addAnnotatedClass(org.example.Member.class);
         config.addAnnotatedClass(org.example.Admin.class);
         config.addAnnotatedClass(org.example.Trainer.class);
+        config.addAnnotatedClass(org.example.HealthMetric.class);
+        config.addAnnotatedClass(org.example.FitnessGoal.class);
         config.configure("hibernate.cfg.xml");
 
         // Begin a transaction, where changes will occur in the database//
@@ -22,12 +24,12 @@ public class Main {
         LoginView view = new LoginView(session);
 
         Member p1 = new Member("bob@gmail.con", "Bob", "Male", LocalDate.now(), 1000);
-        HealthMetric m1 = new HealthMetric("bob@gmail.con", "1", LocalDate.now(), 150,180, 69);
-        HealthMetric m2 = new HealthMetric("bob@gmail.con", "2", LocalDate.now(), 150,180, 70);
-        HealthMetric m3 = new HealthMetric("bob@gmail.con", "2", LocalDate.now(), 150,180, 72);
-        FitnessGoal goal = new FitnessGoal("Gym", 20);
+        //HealthMetric m1 = new HealthMetric("bob@gmail.con", "1", LocalDate.now(), 150,180, 69);
+        //HealthMetric m2 = new HealthMetric("bob@gmail.con", "2", LocalDate.now(), 150,180, 70);
+        //HealthMetric m3 = new HealthMetric("bob@gmail.con", "2", LocalDate.now(), 150,180, 72);
+        //FitnessGoal goal = new FitnessGoal("Gym", 20);
 
-        p1.addNewGoal(goal);
+        //p1.addNewGoal(goal);
         //Profile profile = new Profile(p1);
         //profile.getFrame().setVisible(true);
         //new ProfileView(p1);
