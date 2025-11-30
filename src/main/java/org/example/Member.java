@@ -9,7 +9,8 @@ import java.util.List;
 @Entity
 public class Member  {
     @Id
-    @Column(unique = true, nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
     private String email;
     private String name;
     private String gender;
@@ -44,6 +45,10 @@ public class Member  {
 
 
 
+    @ManyToOne
+    @JoinColumn(name = "trainer_id")
+    private Trainer trainer;
+
     public String getEmail() {
         return email;
     }
@@ -56,6 +61,7 @@ public class Member  {
         return pass;
     }
     public Member(){}
+
     public Member(String email, String name, String gender, LocalDate date, int pass){
         this.email = email;
         this.name = name;
@@ -86,7 +92,6 @@ public class Member  {
 
     public void addMetric(HealthMetric metric){
         this.metrics.add(metric);
-
     }
 
     public boolean checkLogIn(String pass) {
@@ -97,6 +102,10 @@ public class Member  {
 
     public String getName() {
         return name;
+    }
+
+    public int getId() {
+        return id;
     }
 
     public void setName(String newName) {

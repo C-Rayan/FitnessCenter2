@@ -16,6 +16,7 @@ public class Main {
         config.addAnnotatedClass(org.example.Trainer.class);
         config.addAnnotatedClass(org.example.HealthMetric.class);
         config.addAnnotatedClass(org.example.FitnessGoal.class);
+        config.addAnnotatedClass(org.example.Availability.class);
         config.configure("hibernate.cfg.xml");
 
         // Begin a transaction, where changes will occur in the database//
