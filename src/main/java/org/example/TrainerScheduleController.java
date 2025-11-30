@@ -23,7 +23,7 @@ public class TrainerScheduleController {
     public  void addRecurringAvailability(int trainerId, DayOfWeek day, LocalTime startTime, LocalTime endTime){
 
             Trainer t = trainerRepo.findById(session, trainerId);
-            Availability newSlot = new Availability(trainerId, t, day, startTime, endTime);
+            Availability newSlot = new Availability(t, day, startTime, endTime);
             //check for overlaps
             List<Availability> existingSlots = availabiltyRepo.findRepeatingAvailabilityByTrainerAndDay(session, trainerId, day);
             for (Availability current: existingSlots){
@@ -31,16 +31,14 @@ public class TrainerScheduleController {
                     throw new IllegalArgumentException("Overlaps with existing recurring slot");
             }
             availabiltyRepo.saveAvailability(session, newSlot);
-
-
-
     }
 
 
     public void addIndividualAvailability(int trainerId, LocalDate date, LocalTime startTime, LocalTime endTime){
 
+
         Trainer t = trainerRepo.findById(session, trainerId);
-        Availability newSlot = new Availability(trainerId, t, date, startTime, endTime);
+        Availability newSlot = new Availability(t, date, startTime, endTime);
         //check for overlaps
         List<Availability> existingSlots = availabiltyRepo.findSingleAvailabilityByTrainerAndDate(session, trainerId, date);
         for (Availability current: existingSlots){
@@ -53,8 +51,12 @@ public class TrainerScheduleController {
     public List<Availability> getIndividualAvailability(int trainerId, LocalDate date){
         return availabiltyRepo.findSingleAvailabilityByTrainerAndDate(session, trainerId, date);
     }
-    public List<Availability> getAllAvailableSlots(int trainerId){
-        return  availabiltyRepo.findAllAvailabilitiesByTrainer(session, trainerId);
+    public List<Availability> getAllRepeatingAvailableSlots(int trainerId){
+        return  availabiltyRepo.findAllRepeatingAvailabilitiesByTrainer(session, trainerId);
+    }
+
+    public  List<Availability> getAllIndividualAvailableSlots(int trainerId){
+        return  availabiltyRepo.findAllIndividualAvailabilitiesByTrainer(session,trainerId);
     }
 
     public List<Availability> getRepeatingAvailability(int trainerId, DayOfWeek day){

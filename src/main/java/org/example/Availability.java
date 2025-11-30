@@ -2,12 +2,9 @@ package org.example;
 
 import jakarta.persistence.*;
 
-import java.sql.Time;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.temporal.TemporalAdjuster;
 import java.time.temporal.TemporalAdjusters;
 
 @Entity
@@ -24,8 +21,8 @@ public class Availability { //Possible entity class
     private LocalTime endTime;
     private boolean repeats;
 
-    public  Availability(int id, Trainer trainer, LocalDate date, LocalTime start, LocalTime end){
-        this.id = id;
+    public  Availability(Trainer trainer, LocalDate date, LocalTime start, LocalTime end){
+        //this.id = id;
         this.trainer = trainer;
         this.date = date;
         day = date.getDayOfWeek();
@@ -34,8 +31,8 @@ public class Availability { //Possible entity class
         this.repeats = false;
     }
 
-    public Availability(int id, Trainer trainer, DayOfWeek day, LocalTime startTime, LocalTime endTime) {
-        this.id = id;
+    public Availability(Trainer trainer, DayOfWeek day, LocalTime startTime, LocalTime endTime) {
+        //this.id = id;
         this.trainer = trainer;
         this.day = day;
         date = LocalDate.now().with(TemporalAdjusters.nextOrSame(day)); // gets the LocalDate of the next occurance of the day

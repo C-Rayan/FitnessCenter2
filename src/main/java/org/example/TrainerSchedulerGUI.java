@@ -166,8 +166,6 @@ public class TrainerSchedulerGUI extends JFrame {
             );
         });
 
-
-
         formPanel.add(inputPanel);
         formPanel.add(addOneTimeBtn);
         panel.add(formPanel, BorderLayout.SOUTH);
@@ -185,13 +183,9 @@ public class TrainerSchedulerGUI extends JFrame {
     }
 
     private void refreshTables() {
-        Member selectedMember = (Member) memberComboBox.getSelectedItem();
-        if (selectedMember == null)
-            return;
-
         //Refresh recurring table
         recurringTableModel.setRowCount(0);
-        List<Availability> recurringSlots = controller.getAllAvailableSlots(trainer.getId());
+        List<Availability> recurringSlots = controller.getAllRepeatingAvailableSlots(trainer.getId());
         for (Availability slot : recurringSlots) {
             recurringTableModel.addRow(new Object[]{
                     slot.getId(),
@@ -204,13 +198,12 @@ public class TrainerSchedulerGUI extends JFrame {
 
         //Refresh one-time table
         oneTimeTableModel.setRowCount(0);
-        List<Availability> oneTimeSlots = controller.getIndividualAvailability(
-                trainer.getId(), LocalDate.now().minusMonths(1));
+        List<Availability> oneTimeSlots = controller.getAllIndividualAvailableSlots(trainer.getId());
         for (Availability slot : oneTimeSlots) {
             oneTimeTableModel.addRow(new Object[]{
                     slot.getId(),
-                    slot.getStartTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")),
-                    slot.getEndTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")),
+                    LocalDateTime.of(slot.getdate(),slot.getStartTime()).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")),
+                    LocalDateTime.of(slot.getdate(),slot.getEndTime()).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")),
                     "Delete"
             });
         }
@@ -242,8 +235,11 @@ public class TrainerSchedulerGUI extends JFrame {
     private void addOneTimeAvailability(LocalDateTime startTime, LocalDateTime endTime) {
         try {
             LocalDate date = startTime.toLocalDate();
+            System.out.println("bi");
             controller.addIndividualAvailability(trainer.getId(), date, startTime.toLocalTime(), endTime.toLocalTime());
+            System.out.println("boo");
             refreshTables();
+            System.out.println("jon");
             JOptionPane.showMessageDialog(this, "One-time availability added successfully");
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);

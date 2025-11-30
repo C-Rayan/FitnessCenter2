@@ -30,14 +30,34 @@ public class AvailabiltyRepo {
         return session.createQuery(cq).getResultList();
     }
 
-    public List<Availability> findAllAvailabilitiesByTrainer(Session session, int trainerId){
+    public List<Availability> findAllRepeatingAvailabilitiesByTrainer(Session session, int trainerId){
+        CriteriaBuilder cb = session.getCriteriaBuilder();
+        CriteriaQuery<Availability> cq = cb.createQuery(Availability.class);
+        Root<Availability> root = cq.from(Availability.class);
+        //Join statement
+        Join<Availability, Trainer> trainerJoin = root.join("trainer");
+        //WHERE trainer.id = id AND repeats = false
+        cq.where(cb.and
+                        (cb.equal(trainerJoin.get("id"), trainerId)),
+                cb.equal(root.get("repeats"), true)
+                );
+        cq.orderBy(cb.asc(root.get("day")), cb.asc(root.get("startTime")));
+
+        return session.createQuery(cq).getResultList();
+    }
+
+    public List<Availability> findAllIndividualAvailabilitiesByTrainer(Session session, int trainerId){
         CriteriaBuilder cb = session.getCriteriaBuilder();
         CriteriaQuery<Availability> cq = cb.createQuery(Availability.class);
         Root<Availability> root = cq.from(Availability.class);
 
         Join<Availability, Trainer> trainerJoin = root.join("trainer");
-
-        cq.where(cb.equal(trainerJoin.get("id"), trainerId));
+        //WHERE trainer.id = id AND repeats = false
+        cq.where(cb.and
+                        (cb.equal(trainerJoin.get("id"), trainerId)),
+                cb.equal(root.get("repeats"), false)
+        );
+        //ORDER BY day, startTime
         cq.orderBy(cb.asc(root.get("day")), cb.asc(root.get("startTime")));
 
         return session.createQuery(cq).getResultList();
