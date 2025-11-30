@@ -21,6 +21,10 @@ public class Member  {
     private LocalDate dateOfBirth;
     private ArrayList<FitnessGoal> goals;
 
+    @ManyToOne
+    @JoinColumn(name = "trainer_id")
+    private Trainer trainer;
+
     public String getEmail() {
         return email;
     }

@@ -1,25 +1,35 @@
 package org.example;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Trainer {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
     @Column(unique = true, nullable = false)
     private String email;
     private String name;
     private int pass;
+    @OneToMany
+    private List<Availability> availabilities;
+    //private  List<Availability> singleAvailabilities;
+    @OneToMany(mappedBy = "trainer")
+    private List<Member> clients;
 
     public Trainer(String email, String name, int pass) {
         this.email = email;
         this.name = name;
         this.pass = pass;
+        availabilities = new ArrayList<>();
+        //singleAvailabilities = new ArrayList<>();
     }
 
     public Trainer(){}
+
 
     public String getName() {
         return name;
@@ -39,6 +49,32 @@ public class Trainer {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+    /*
+    public List<Member> getClients() {
+        return clients;
+    }
+
+    public void setClients(List<Member> clients) {
+        this.clients = clients;
+    }
+
+     */
+
+    public List<Availability> getAvailabilities() {
+        return availabilities;
+    }
+
+    public void setAvailabilities(List<Availability> availabilities) {
+        this.availabilities = availabilities;
     }
 
     @Override
