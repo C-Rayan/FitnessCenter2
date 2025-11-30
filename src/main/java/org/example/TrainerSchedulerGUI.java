@@ -11,23 +11,27 @@ import java.awt.*;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class TrainerSchedulerGUI extends JFrame {
     private TrainerScheduleController controller;
     private Trainer trainer;
     private JComboBox<Member> memberComboBox;
+    private JTextField searchField;
+    private JButton searchButton;
     private JTabbedPane tabbedPane;
     private JTable recurringTable;
     private JTable oneTimeTable;
     private DefaultTableModel recurringTableModel;
     private DefaultTableModel oneTimeTableModel;
+    private List<Member> allClients;
 
     public TrainerSchedulerGUI(Session session, Trainer trainer) {
         controller = new TrainerScheduleController(session);
         this.trainer = trainer;
         controller.addTrainer(trainer);
         initializeUI();
-        loadMembers();
+        //loadMembers();
         refreshTables();
     }
 
@@ -38,7 +42,7 @@ public class TrainerSchedulerGUI extends JFrame {
 
         JPanel mainPanel = new JPanel(new BorderLayout());
 
-        //Top panel - Trainer selection ( change to member)
+        /*Top panel - Trainer selection ( remove)
         JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         topPanel.add(new JLabel("Select Member:"));
         memberComboBox = new JComboBox<>();
@@ -49,7 +53,12 @@ public class TrainerSchedulerGUI extends JFrame {
         addTrainerBtn.addActionListener(e -> showAddClientDialog());
         topPanel.add(addTrainerBtn);
 
-        mainPanel.add(topPanel, BorderLayout.NORTH);
+        //mainPanel.add(topPanel, BorderLayout.NORTH);
+
+         */
+        //Quick search
+        //JPanel topPanel = createTopPanel();
+        //mainPanel.add(topPanel, BorderLayout.NORTH);
 
         // Center panel - Tabs for different availability types
         tabbedPane = new JTabbedPane();
@@ -61,8 +70,6 @@ public class TrainerSchedulerGUI extends JFrame {
         // One-Time Availability Tab
         JPanel oneTimePanel = createOneTimeAvailabilityPanel();
         tabbedPane.addTab("One-Time Availability", oneTimePanel);
-
-
 
         mainPanel.add(tabbedPane, BorderLayout.CENTER);
 
@@ -173,23 +180,187 @@ public class TrainerSchedulerGUI extends JFrame {
         return panel;
     }
 
+    private  JPanel createClientPanel(){
+        JPanel panel = new JPanel(new BorderLayout(10, 10));
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        // Search panel for client management
+        JPanel searchManagementPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
+        JTextField managementSearchField = new JTextField(20);
+        JButton managementSearchButton = new JButton("Search Clients");
+        JButton refreshButton = new JButton("Refresh All");
+
+        searchManagementPanel.add(new JLabel("Search:"));
+        searchManagementPanel.add(managementSearchField);
+        searchManagementPanel.add(managementSearchButton);
+        searchManagementPanel.add(refreshButton);
+
+        // Client list table
+        String[] columns = {"ID", "Name", "Goal","Metric"};
+        DefaultTableModel clientTableModel = new DefaultTableModel(columns, 0);
+
+        JTable clientTable = new JTable(clientTableModel);
+        JScrollPane trainerScrollPane = new JScrollPane(clientTable);
+        trainerScrollPane.setPreferredSize(new Dimension(800, 300));
+
+        // Add client form
+        JPanel addClientPanel = new JPanel(new GridLayout(2, 2, 5, 5));
+        addClientPanel.setBorder(BorderFactory.createTitledBorder("Add New Client"));
+
+        JTextField newClientName = new JTextField();
+        JTextField newClientEmail = new JTextField();
+
+        addClientPanel.add(new JLabel("Name:"));
+        addClientPanel.add(newClientName);
+        addClientPanel.add(new JLabel("Email:"));
+        addClientPanel.add(newClientEmail);
+
+        JButton addTrainerBtn = new JButton("Add Client");
+        /*
+        addTrainerBtn.addActionListener(e -> {
+            addNewClient(newClientName.getText(), newClientEmail.getText());
+            newClientName.setText("");
+            newClientEmail.setText("");
+            refreshMemberTable(clientTableModel);
+            loadMembers(); // Refresh the main combo box
+        });
+
+         */
+
+        // Action listeners
+        managementSearchButton.addActionListener(e -> {
+            searchAndDisplayClients(managementSearchField.getText(), clientTableModel);
+        });
+
+        refreshButton.addActionListener(e -> {
+            refreshMemberTable(clientTableModel);
+            loadMembers();
+        });
+
+        managementSearchField.addActionListener(e -> {
+            searchAndDisplayClients(managementSearchField.getText(), clientTableModel);
+        });
+
+        // Layout
+        JPanel northPanel = new JPanel(new BorderLayout());
+        northPanel.add(searchManagementPanel, BorderLayout.NORTH);
+        northPanel.add(addClientPanel, BorderLayout.CENTER);
+        northPanel.add(addTrainerBtn, BorderLayout.SOUTH);
+
+        panel.add(northPanel, BorderLayout.NORTH);
+        panel.add(trainerScrollPane, BorderLayout.CENTER);
+
+        // Load initial data
+        refreshMemberTable(clientTableModel);
+
+        return panel;
+    }
 
     private void loadMembers() {
+        /*
         List<Member> members = controller.getAllMembers(trainer.getId());
         memberComboBox.removeAllItems();
         for (Member client : members) {
             memberComboBox.addItem(client);
         }
+         */
+        allClients = controller.getAllMembers(trainer.getId());
+        updateMemberComboBox(allClients);
     }
 
-    private void refreshTables() {
+    private  void  updateMemberComboBox(List<Member> clients){
+        Member client = (Member) memberComboBox.getSelectedItem();
+        memberComboBox.removeAllItems();
+
+        for (Member m : clients){
+            memberComboBox.addItem(m);
+        }
+
+        // Try to restore selection if possible
+        if (client != null) {
+            for (int i = 0; i < memberComboBox.getItemCount(); i++) {
+                if (memberComboBox.getItemAt(i).getId() == client.getId()) {
+                    memberComboBox.setSelectedIndex(i);
+                    break;
+                }
+            }
+        }
+        // If no selection and there are trainers, select first one
+        if (memberComboBox.getSelectedItem() == null && memberComboBox.getItemCount() > 0) {
+            memberComboBox.setSelectedIndex(0);
+        }
+    }
+
+    private void searchClients(){
+        String searchText = searchField.getText().trim().toLowerCase();
+
+        if (searchText.isEmpty()) {
+            updateMemberComboBox(allClients);
+            return;
+        }
+
+        List<Member> filteredMembers = allClients.stream()
+                .filter(member ->
+                        member.getName().toLowerCase().contains(searchText) ||
+                                member.getEmail().toLowerCase().contains(searchText))
+                .collect(Collectors.toList());
+
+        updateMemberComboBox(filteredMembers);
+
+        if (filteredMembers.isEmpty()) {
+            JOptionPane.showMessageDialog(this,
+                    "No trainers found matching: " + searchText,
+                    "Search Results",
+                    JOptionPane.INFORMATION_MESSAGE);
+        }
+    }
+
+    private  void clearSearch(){
+        searchField.setText("");
+        updateMemberComboBox(allClients);
+    }
+
+    private void searchAndDisplayClients(String searchText, DefaultTableModel tableModel) {
+        List<Member> members;
+
+        if (searchText == null || searchText.trim().isEmpty()) {
+            members = controller.getAllMembers(trainer.getId());
+        } else {
+            String searchLower = searchText.trim().toLowerCase();
+            members = controller.getAllMembers(trainer.getId()).stream()
+                    .filter(member ->
+                            member.getName().toLowerCase().contains(searchLower) ||
+                                    member.getEmail().toLowerCase().contains(searchLower))
+                    .collect(Collectors.toList());
+        }
+
+        refreshClientTableWithData(tableModel, members);
+    }
+    private void refreshMemberTable(DefaultTableModel tableModel) {
+        List<Member> members = controller.getAllMembers(trainer.getId());
+        refreshClientTableWithData(tableModel, members);
+    }
+
+    private void refreshClientTableWithData(DefaultTableModel tableModel, List<Member> members) {
+        tableModel.setRowCount(0);
+
+        for (Member member : members) {
+            tableModel.addRow(new Object[]{
+                    member.getId(),
+                    member.getName(),
+                    member.getEmail(),
+                    "Delete"
+            });
+        }
+    }
+        private void refreshTables() {
         //Refresh recurring table
         recurringTableModel.setRowCount(0);
         List<Availability> recurringSlots = controller.getAllRepeatingAvailableSlots(trainer.getId());
         for (Availability slot : recurringSlots) {
             recurringTableModel.addRow(new Object[]{
                     slot.getId(),
-                    slot.getdate().toString(),
+                    slot.getDay().toString(),
                     slot.getStartTime().format(DateTimeFormatter.ofPattern("HH:mm")),
                     slot.getEndTime().format(DateTimeFormatter.ofPattern("HH:mm")),
                     "Delete"
@@ -247,6 +418,24 @@ public class TrainerSchedulerGUI extends JFrame {
         }
     }
 
+    /*
+    private void addNewClient(String name, String email){
+        if (name == null || name.trim().isEmpty() || email == null || email.trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Name and email are required", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        try {
+            scheduleService.addTrainer(name.trim(), email.trim());
+            JOptionPane.showMessageDialog(this, "Trainer added successfully");
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+
+    }
+
+     */
+
     private void showAddClientDialog() {
         JTextField nameField = new JTextField(20);
         JTextField emailField = new JTextField(20);
@@ -297,27 +486,25 @@ public class TrainerSchedulerGUI extends JFrame {
             button.addActionListener(e -> {
                 fireEditingStopped();
                 int modelRow = table.convertRowIndexToModel(row);
-                //deleteAvailability(modelRow);
+                deleteAvailability(modelRow);
             });
             return button;
         }
 
-        /*
-        private void deleteAvailability(int row) {
-            Trainer selectedTrainer = (Trainer) trainerComboBox.getSelectedItem();
-            if (selectedTrainer == null) return;
 
+        private void deleteAvailability(int row) {
+
+            int availabilityId;
             if (isRecurring) {
-                int availabilityId = (Integer) recurringTableModel.getValueAt(row, 0);
-                scheduleService.removeRecurringAvailability(availabilityId, selectedTrainer.getId());
+                availabilityId = (Integer) recurringTableModel.getValueAt(row, 0);
             } else {
-                int availabilityId = (Integer) oneTimeTableModel.getValueAt(row, 0);
-                scheduleService.removeOneTimeAvailability(availabilityId, selectedTrainer.getId());
+                availabilityId = (Integer) oneTimeTableModel.getValueAt(row, 0);
             }
+            controller.removeAvailability(availabilityId, trainer.getId());
             refreshTables();
         }
 
-         */
+
     }
 
     public static void main(String[] args) {

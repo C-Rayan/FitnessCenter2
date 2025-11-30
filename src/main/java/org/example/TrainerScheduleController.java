@@ -2,9 +2,7 @@ package org.example;
 
 import org.hibernate.Session;
 
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.time.*;
 import java.util.List;
 
 public class TrainerScheduleController {
@@ -21,21 +19,29 @@ public class TrainerScheduleController {
         trainerRepo.save(session, trainer);
     }
     public  void addRecurringAvailability(int trainerId, DayOfWeek day, LocalTime startTime, LocalTime endTime){
-
-            Trainer t = trainerRepo.findById(session, trainerId);
-            Availability newSlot = new Availability(t, day, startTime, endTime);
-            //check for overlaps
-            List<Availability> existingSlots = availabiltyRepo.findRepeatingAvailabilityByTrainerAndDay(session, trainerId, day);
-            for (Availability current: existingSlots){
-                if(newSlot.overlaps(current))
-                    throw new IllegalArgumentException("Overlaps with existing recurring slot");
+        //Checks that slot is at least 10min
+        Duration diff = Duration.between(startTime, endTime);
+        if (diff.toMinutes() < 10) {
+            throw new IllegalArgumentException("Time slot should be at least 10min");
+        }
+        Trainer t = trainerRepo.findById(session, trainerId);
+        Availability newSlot = new Availability(t, day, startTime, endTime);
+        //check for overlaps
+        List<Availability> existingSlots = availabiltyRepo.findRepeatingAvailabilityByTrainerAndDay(session, trainerId, day);
+        for (Availability current: existingSlots){
+            if(newSlot.overlaps(current))
+                throw new IllegalArgumentException("Overlaps with existing recurring slot");
             }
-            availabiltyRepo.saveAvailability(session, newSlot);
+        availabiltyRepo.saveAvailability(session, newSlot);
     }
 
 
     public void addIndividualAvailability(int trainerId, LocalDate date, LocalTime startTime, LocalTime endTime){
-
+        //Checks that slot is at least 10min
+        Duration diff = Duration.between(startTime, endTime);
+        if (diff.toMinutesPart() < 10) {
+            throw new IllegalArgumentException("Time slot should be at least 10min");
+        }
 
         Trainer t = trainerRepo.findById(session, trainerId);
         Availability newSlot = new Availability(t, date, startTime, endTime);
@@ -48,9 +54,6 @@ public class TrainerScheduleController {
         availabiltyRepo.saveAvailability(session, newSlot);
     }
 
-    public List<Availability> getIndividualAvailability(int trainerId, LocalDate date){
-        return availabiltyRepo.findSingleAvailabilityByTrainerAndDate(session, trainerId, date);
-    }
     public List<Availability> getAllRepeatingAvailableSlots(int trainerId){
         return  availabiltyRepo.findAllRepeatingAvailabilitiesByTrainer(session, trainerId);
     }
@@ -61,6 +64,9 @@ public class TrainerScheduleController {
 
     public List<Availability> getRepeatingAvailability(int trainerId, DayOfWeek day){
         return  availabiltyRepo.findRepeatingAvailabilityByTrainerAndDay(session, trainerId, day);
+    }
+    public List<Availability> getIndividualAvailability(int trainerId, LocalDate date){
+        return availabiltyRepo.findSingleAvailabilityByTrainerAndDate(session, trainerId, date);
     }
 
     public  List<Member> getAllMembers(int trainerId){

@@ -13,7 +13,8 @@ import java.util.Date;
 @Entity
 public class Member  {
     @Id
-    @Column(unique = true, nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
     private String email;
     private String name;
     private String gender;
@@ -75,5 +76,9 @@ public class Member  {
 
     public String getName() {
         return name;
+    }
+
+    public int getId() {
+        return id;
     }
 }

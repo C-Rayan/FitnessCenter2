@@ -90,4 +90,8 @@ public class Trainer {
             return true;
         return false;
     }
+
+    public List<Member> getClients() {
+        return clients;
+    }
 }

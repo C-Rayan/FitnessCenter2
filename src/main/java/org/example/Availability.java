@@ -86,7 +86,10 @@ public class Availability { //Possible entity class
     }
 
     public boolean overlaps(Availability slot){
-        return  (slot.getdate() == date) &&(startTime.isBefore(slot.endTime) && endTime.isAfter(slot.startTime));
+        return  (slot.getdate() == date || slot.getDay() == day) &&(startTime.isBefore(slot.endTime) && endTime.isAfter(slot.startTime));
     }
 
+    public DayOfWeek getDay() {
+        return day;
+    }
 }
