@@ -30,7 +30,6 @@ public class ClassView extends JFrame {
     private Availability newSlot;
     private JPanel classPanel;
     private JPanel listClass;
-    private JLabel availL;
 
 
 
@@ -81,17 +80,16 @@ public class ClassView extends JFrame {
         }
     }
 
+    // Adds/Defines a new row to the gui with a new class
     public void addToGui(Class newClass) {
         JPanel classRow = new JPanel();
         classRow.setName(String.valueOf(newClass.getCid()));
         classRow.setLayout(new BoxLayout(classRow, BoxLayout.X_AXIS));
         JLabel lTitle = new JLabel("Name: " + newClass.getTitle());
         JLabel lSize = new JLabel("Capacity: " + String.valueOf(newClass.getCapacity()));
-        availL = new JLabel(newClass.getTime().toString());
+        JLabel availL = new JLabel(newClass.getTime().toString());
         JButton addTrainer = new JButton("Assign a trainer to this class");
         JButton addRoom = new JButton("Assign a room to this class");
-
-
 
         classRow.add(lTitle); classRow.add(Box.createHorizontalGlue());
         classRow.add(lSize); classRow.add(Box.createHorizontalGlue());
@@ -105,7 +103,6 @@ public class ClassView extends JFrame {
             Class checkClass = session.find(Class.class, classID);
             boolean tSucc = assignTrainer(checkClass);
             if (tSucc) {
-                System.out.println("Hapenning");
                 addTrainer.setVisible(false);
                 availL.setText(checkClass.getTime().toString());
             }
@@ -168,7 +165,13 @@ public class ClassView extends JFrame {
 
     public boolean assignRoom(Class checkClass){
         try{
-            List<Room> availableRooms = getAllAvailRooms();
+            ArrayList<Room> availableRooms = (ArrayList<Room>) getAllAvailRooms();
+            // Only keep rooms that have enough capacity to accomodate
+            for (Room r : availableRooms){
+                if (checkClass.getCapacity() > r.getCapacity()){
+                    availableRooms.remove(r);
+                }
+            }
             Room room = (Room) JOptionPane.showInputDialog(this, "Please choose an available room", "Something",  JOptionPane.QUESTION_MESSAGE, null, availableRooms.toArray(), availableRooms.getFirst());
             // Add room and make it unavailable for next person
             session.beginTransaction();
@@ -439,8 +442,5 @@ public class ClassView extends JFrame {
             this.getJMenuBar().remove(returnt);
         });
     }
-
-
-
 }
 
