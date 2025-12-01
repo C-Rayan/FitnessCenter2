@@ -306,8 +306,8 @@ public class TrainerSchedulerGUI extends JFrame {
             tableModel.addRow(new Object[]{
                     member.getId(),
                     member.getName(),
-                    member.getGoals().toString(),
-                    member.getMetrics().toString()
+                    member.getGoals().getLast().toString(),
+                    member.getMetrics().getLast().toString()
             });
         }
     }
