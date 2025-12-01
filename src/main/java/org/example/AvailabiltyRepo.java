@@ -11,6 +11,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;
 
+//All the database availability methods
 public class AvailabiltyRepo {
     public List<Availability> findRepeatingAvailabilityByTrainerAndDay(Session session, int trainerId, DayOfWeek day){
         //See @TrainerRepo for explanation
