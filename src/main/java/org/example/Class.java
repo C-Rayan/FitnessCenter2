@@ -55,6 +55,7 @@ public class Class {
         this.room = null;
         participants = new ArrayList<>();
     }
+    public Class(){}
 
     public void addPerson(Member person){
         participants.add(person);
@@ -83,5 +84,10 @@ public class Class {
 
     public void setRoom(Room room) {
         this.room = room;
+    }
+
+    public Object[] getObj(){
+        Object[] object = {title, trainer != null ? this.getTrainer().getName() : "Unknown" , getTime().getdate(), getTime().getStartTime(), getTime().getEndTime()};
+        return object;
     }
 }

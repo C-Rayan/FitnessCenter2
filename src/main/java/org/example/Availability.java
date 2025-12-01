@@ -23,6 +23,7 @@ public class Availability { //Possible entity class
     private boolean repeats;
     private boolean reserved;
 
+    public Availability(){}
     public Availability(Trainer trainer, LocalDate date, LocalTime start, LocalTime end){
         //this.id = id;
         this.trainer = trainer;

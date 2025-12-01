@@ -18,7 +18,9 @@ public class Member  {
     private String gender;
     private int pass;
     private LocalDate dateOfBirth;
+    @Transient
     private int numEntry = 0;
+    @Transient
     private int numGoals = 0;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
@@ -34,12 +36,11 @@ public class Member  {
     }
 
     // Don't add them to DB, used to streamline checks
-    @Transient
+
     public void setNumGoals(int numGoals) {
         this.numGoals = numGoals;
     }
 
-    @Transient
     public void setNumEntry(int numEntry) {
         this.numEntry = numEntry;
     }

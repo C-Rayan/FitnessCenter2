@@ -4,9 +4,8 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.hibernate.cfg.Configuration;
+import org.hibernate.mapping.Column;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -23,7 +22,7 @@ public class MemberBooking extends  JFrame {
     private JPanel groupPanel;
     private JPanel ptPanel;
     private JPanel reschedulePanel;
-    private JComboBox<Class> groupComboBox1;
+    private JComboBox<String> groupComboBox1;
     private JButton registerButton;
     private JTable groupInfoTable;
     private JComboBox<Trainer> trainerComboBox;
@@ -47,20 +46,30 @@ public class MemberBooking extends  JFrame {
     private  void intializeUI(Member user){
         setTitle("Main Menu");
         setSize(800, 600);
-        setLocationRelativeTo(null);
+        //setLocationRelativeTo(null);
 
         //Group tab
         intializeGroup();
+
         registerButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                Class chosenClass = (Class) groupComboBox1.getSelectedItem();
-                if(chosenClass.getCapacity() ==0){
+                Class getClass = session.createQuery("From Class c where c.title = :title", Class.class).setParameter("title", groupComboBox1.getSelectedItem()).uniqueResult();
+                if(getClass.getCapacity() <= 0){
                     JOptionPane.showMessageDialog(groupPanel, "Group is full. Pick Another");
                 }
                 else {
-                    user.addClass(chosenClass);
+                    user.addClass(getClass);
+                    for (int i = 0; i<groupInfoTableModel.getRowCount(); i++){
+                        Object val = groupInfoTable.getValueAt(i, 0);
+                        if (val.equals(getClass.getTitle())){
+                            groupInfoTableModel.removeRow(i);
+                            groupComboBox1.removeItem(val);
+                            break;
+                        }
+                    }
                     Transaction transaction = session.beginTransaction();
+                    //groupComboBox1.remove(getClass);
                     session.merge(user);
                     transaction.commit();
                 }
@@ -74,6 +83,7 @@ public class MemberBooking extends  JFrame {
         //intializeReschedule();
 
         add(mainPanel);
+        this.setVisible(true);
     }
 
     private void intializeGroup(){
@@ -88,9 +98,12 @@ public class MemberBooking extends  JFrame {
         List<Trainer> trainers = repo.findAllTrainers(session);
         //Group Booking
         List<Class> groupSessions = getGroupSessions();
+        for (int i = 0; i < groupSessions.size(); i++){
+            groupInfoTableModel.addRow(groupSessions.get(i).getObj());
+        }
         groupComboBox1.removeAllItems();
         for (Class group: groupSessions){
-            groupComboBox1.addItem(group);
+            groupComboBox1.addItem(group.getTitle());
         }
     }
 
@@ -98,6 +111,10 @@ public class MemberBooking extends  JFrame {
         CriteriaBuilder cb = session.getCriteriaBuilder();
         CriteriaQuery<Class> cq = cb.createQuery(Class.class);
         Root<Class> root = cq.from(Class.class);
+//        cq.select(cb.and(
+//                cq.where(root.get()),
+//                cq.where()
+//        ))
         cq.select(root).orderBy(cb.asc(root.get("title")));
         return session.createQuery(cq).getResultList();
     }
@@ -114,27 +131,6 @@ public class MemberBooking extends  JFrame {
                     group.getTime().getEndTime().format(DateTimeFormatter.ofPattern("HH:mm"))
             });
         }
-
-    }
-
-    public static void main(String[] args) {
-        Configuration config = new Configuration();
-        config.addAnnotatedClass(org.example.Member.class);
-        config.addAnnotatedClass(org.example.Admin.class);
-        config.addAnnotatedClass(org.example.Trainer.class);
-        config.addAnnotatedClass(org.example.Availability.class);
-        config.addAnnotatedClass(org.example.FitnessGoal.class);
-        config.addAnnotatedClass(org.example.HealthMetric.class);
-        config.addAnnotatedClass(org.example.Class.class);
-        config.addAnnotatedClass(org.example.Room.class);
-
-        config.configure("hibernate.cfg.xml");
-
-
-        // Begin a transaction, where changes will occur in the database//
-        SessionFactory sf = config.buildSessionFactory();
-        Session session = sf.openSession();
-        Member jane = new Member("ho@gmail.com", "Jane", "Male", LocalDate.now(), 1);
 
     }
 }

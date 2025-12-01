@@ -38,7 +38,7 @@
           </grid>
         </constraints>
         <properties>
-          <text value="Metics:"/>
+          <text value="Metrics:"/>
         </properties>
       </component>
       <component id="e26e5" class="javax.swing.JLabel" binding="emailTxt">
