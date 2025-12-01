@@ -31,10 +31,13 @@ public class Member  {
         return numGoals;
     }
 
+    // Don't add them to DB, used to streamline checks
+    @Transient
     public void setNumGoals(int numGoals) {
         this.numGoals = numGoals;
     }
 
+    @Transient
     public void setNumEntry(int numEntry) {
         this.numEntry = numEntry;
     }

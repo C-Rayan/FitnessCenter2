@@ -25,7 +25,7 @@ public class MemberBooking extends  JFrame {
         controller = new TrainerScheduleController(session);
         intializeUI();
         loadData();
-        refresh();
+        //refresh();
     }
 
     private  void intializeUI(){

@@ -13,6 +13,7 @@ public class Class {
     private String title;
     private int capacity;
 
+    // Somewhat "helper" entity class, used to help implementation
     @OneToOne(cascade = CascadeType.ALL)
     private Availability time;
 

@@ -83,18 +83,22 @@ public class LoginView extends JFrame  {
             Member checkMember = session.createQuery("From Member tra where tra.email = :email", Member.class).setParameter("email", putEmail.getText()).uniqueResult();
             // Have to use an SQL query to find by email, but use an index to increase lookup time
             Trainer checkTrainer = session.createQuery("From Trainer tra where tra.email = :email", Trainer.class).setParameter("email", putEmail.getText()).uniqueResult();
-            Admin checkAdmin = null;//session.find(Admin.class, putEmail.getText());
+            Admin checkAdmin = session.createQuery("From Admin tra where tra.email = :email", Admin.class).setParameter("email", putEmail.getText()).uniqueResult();
             boolean loggedIn = false;
             String userType = "";
             // Check if any user with those details exists
             if (checkMember != null){
                 loggedIn = checkMember.checkLogIn(String.valueOf(putPass.getText()));
-                userType = "Member";}
+                userType = "Member";
+            }
            else if (checkTrainer != null){
                 loggedIn = checkTrainer.checkLogIn(String.valueOf(putPass.getText()));
-                userType = "Trainer";}
+                userType = "Trainer";
+           }
            else if (checkAdmin != null){
-                loggedIn = checkAdmin.checkLogIn(String.valueOf(putPass.getText())); userType = "Admin";}
+                loggedIn = checkAdmin.checkLogIn(String.valueOf(putPass.getText()));
+                userType = "Admin";
+           }
 
             // Close transaction
             if (loggedIn){
@@ -104,9 +108,12 @@ public class LoginView extends JFrame  {
                     new ProfileView(checkMember, session);
                 }
                 else if (userType.equals("Trainer")){
-                    System.out.println("Happening");
                     loginFrame.dispose();
                     new TrainerSchedulerGUI(session, checkTrainer).setVisible(true);
+                }
+                else if (userType.equals("Admin")) {
+                    loginFrame.dispose();
+                    new ClassView(session);
                 }
             }
         });

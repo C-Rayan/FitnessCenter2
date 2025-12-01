@@ -7,14 +7,14 @@ import java.time.LocalDate;
 @Entity
 public class HealthMetric {
     @Id
-   // @GeneratedValue(strategy = GenerationType.IDENTITY)
+    // Weak ID, can't be fully identified by it's own
     private String title;
     private LocalDate date;
     private  int height;
     private double heartRate;
     private  double weight;
 
-
+    // Needs each member's ID added as another PK column, to create a composite key
     @ManyToOne
     @EmbeddedId
     private Member member;

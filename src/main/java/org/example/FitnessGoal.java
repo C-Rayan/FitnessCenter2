@@ -5,12 +5,14 @@ import org.hibernate.annotations.CompositeType;
 
 @Entity
 public class FitnessGoal {
+    // Title is a weak PK
+    @Id
+    private String title;
     private double progress; // as a percentage ( subject to change)
     private double curr;
     private double newer;
-    @Id
-    private String title;
 
+    // Needs each member's ID added as another PK column, to create a composite key
     @ManyToOne
     @EmbeddedId
     private Member member;
