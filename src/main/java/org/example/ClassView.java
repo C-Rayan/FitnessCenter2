@@ -26,7 +26,7 @@ public class ClassView extends JFrame {
     private JTextField title;
     private JTextField size;
     private AvailabiltyRepo availabiltyRepo;
-    private Class myClass;
+    private GroupClass myGroupClass;
     private Availability newSlot;
     private JPanel classPanel;
     private JPanel listClass;
@@ -36,7 +36,7 @@ public class ClassView extends JFrame {
 
     public ClassView(Session session){
         availabiltyRepo = new AvailabiltyRepo();
-        this.myClass = myClass;
+        this.myGroupClass = myGroupClass;
         this.setResizable(true);
         this.session = session;
 
@@ -75,19 +75,19 @@ public class ClassView extends JFrame {
 
     // If there are classes on startup, addThem
     public void refreshClassTables(){
-        List<Class> allClasses = getAllClasses();
-        for (Class allClass : allClasses) {
-            addToGui(allClass);
+        List<GroupClass> allGroupClasses = getAllClasses();
+        for (GroupClass allGroupClass : allGroupClasses) {
+            addToGui(allGroupClass);
         }
     }
 
-    public void addToGui(Class newClass) {
+    public void addToGui(GroupClass newGroupClass) {
         JPanel classRow = new JPanel();
-        classRow.setName(String.valueOf(newClass.getCid()));
+        classRow.setName(String.valueOf(newGroupClass.getCid()));
         classRow.setLayout(new BoxLayout(classRow, BoxLayout.X_AXIS));
-        JLabel lTitle = new JLabel("Name: " + newClass.getTitle());
-        JLabel lSize = new JLabel("Capacity: " + String.valueOf(newClass.getCapacity()));
-        availL = new JLabel(newClass.getTime().toString());
+        JLabel lTitle = new JLabel("Name: " + newGroupClass.getTitle());
+        JLabel lSize = new JLabel("Capacity: " + String.valueOf(newGroupClass.getCapacity()));
+        availL = new JLabel(newGroupClass.getTime().toString());
         JButton addTrainer = new JButton("Assign a trainer to this class");
         JButton addRoom = new JButton("Assign a room to this class");
 
@@ -102,29 +102,29 @@ public class ClassView extends JFrame {
         addTrainer.addActionListener(e ->{
             // The name of each row is the ID it corresponds to
             int classID = Integer.parseInt(classRow.getName());
-            Class checkClass = session.find(Class.class, classID);
-            boolean tSucc = assignTrainer(checkClass);
+            GroupClass checkGroupClass = session.find(GroupClass.class, classID);
+            boolean tSucc = assignTrainer(checkGroupClass);
             if (tSucc) {
                 System.out.println("Hapenning");
                 addTrainer.setVisible(false);
-                availL.setText(checkClass.getTime().toString());
+                availL.setText(checkGroupClass.getTime().toString());
             }
         });
 
         addRoom.addActionListener(e ->{
             int classID = Integer.parseInt(classRow.getName());
-            Class checkClass = session.find(Class.class, classID);
-            boolean rSucc = assignRoom(checkClass);
+            GroupClass checkGroupClass = session.find(GroupClass.class, classID);
+            boolean rSucc = assignRoom(checkGroupClass);
             if (rSucc) {
                 addRoom.setVisible(false);
-                JLabel rLbl = new JLabel(checkClass.getRoom().toString());
+                JLabel rLbl = new JLabel(checkGroupClass.getRoom().toString());
                 classRow.add(rLbl);
             }
         });
         listClass.add(classRow);
     }
 
-    public boolean assignTrainer(Class checkClass) {
+    public boolean assignTrainer(GroupClass checkGroupClass) {
         try{
             // Bit of wasted space, but couldn't figure out another way
             ArrayList<Availability> validBilities = new ArrayList<>();
@@ -134,7 +134,7 @@ public class ClassView extends JFrame {
             // Go thru each availability that belongs to a trainer
             for (Availability avt : AVT){
                 // If the class can fit completely in a trainer's time, then that trainer is a valid choice
-                if (avt.isWithin(checkClass.getTime()) && !avt.isReserved()){
+                if (avt.isWithin(checkGroupClass.getTime()) && !avt.isReserved()){
                     validTrainers.add(avt.getTrainer());
                     validBilities.add(avt);
                 }
@@ -152,8 +152,8 @@ public class ClassView extends JFrame {
             if (index != -1) {
                 session.beginTransaction();
                 AVT.get(index).setReserved(true);
-                checkClass.setTrainer(trainer);
-                checkClass.setTime(AVT.get(index));
+                checkGroupClass.setTrainer(trainer);
+                checkGroupClass.setTime(AVT.get(index));
                 session.getTransaction().commit();
                 return true;
             }
@@ -166,14 +166,14 @@ public class ClassView extends JFrame {
         }
     }
 
-    public boolean assignRoom(Class checkClass){
+    public boolean assignRoom(GroupClass checkGroupClass){
         try{
             List<Room> availableRooms = getAllAvailRooms();
             Room room = (Room) JOptionPane.showInputDialog(this, "Please choose an available room", "Something",  JOptionPane.QUESTION_MESSAGE, null, availableRooms.toArray(), availableRooms.getFirst());
             // Add room and make it unavailable for next person
             session.beginTransaction();
-            checkClass.setRoom(room);
-            checkClass.getRoom().setAvailability(false);
+            checkGroupClass.setRoom(room);
+            checkGroupClass.getRoom().setAvailability(false);
             session.getTransaction().commit();
             return true;
         }
@@ -231,16 +231,16 @@ public class ClassView extends JFrame {
         else {
             try {
                     // This will still update the PK, even if it didn't add
-                    Class newClass = new Class(title.getText().trim(), Integer.parseInt(size.getText().trim()), newSlot);
+                    GroupClass newGroupClass = new GroupClass(title.getText().trim(), Integer.parseInt(size.getText().trim()), newSlot);
                     session.beginTransaction();
-                    session.persist(newClass);
+                    session.persist(newGroupClass);
                     session.getTransaction().commit();
                     title.setText("Enter class name");
                     title.setOpaque(false);
                     size.setText("Enter size");
                     size.setOpaque(false);
                     JOptionPane.showMessageDialog(this, "This class has been succesfully created!");
-                    addToGui(newClass);
+                    addToGui(newGroupClass);
                 } catch (org.hibernate.exception.ConstraintViolationException s) {
                     // Couldn't persist it since its not unique, so revert to previous state
                     session.getTransaction().rollback();
@@ -396,10 +396,10 @@ public class ClassView extends JFrame {
     }
 
 
-    public List<Class> getAllClasses(){
+    public List<GroupClass> getAllClasses(){
         CriteriaBuilder cb = session.getCriteriaBuilder();
-        CriteriaQuery<Class> cq = cb.createQuery(Class.class);
-        Root<Class> root = cq.from(Class.class);
+        CriteriaQuery<GroupClass> cq = cb.createQuery(GroupClass.class);
+        Root<GroupClass> root = cq.from(GroupClass.class);
         return session.createQuery(cq).getResultList();
     }
 

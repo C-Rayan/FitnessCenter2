@@ -13,8 +13,6 @@ public class Admin {
     private String name;
     private int pass;
 
-
-
     public Admin(String email, String name, int pass) {
         this.email = email;
         this.name = name;
@@ -43,17 +41,17 @@ public class Admin {
         this.email = email;
     }
 
+    public boolean checkLogIn(String pass) {
+        if (Integer.toString(this.pass).equals(pass))
+            return true;
+        return false;
+    }
+
     @Override
     public String toString() {
         return "Member{" +
                 "name='" + name + '\'' +
                 ", email='" + email + '\'' +
                 '}';
-    }
-
-    public boolean checkLogIn(String pass) {
-        if (Integer.toString(this.pass).equals(pass))
-            return true;
-        return false;
     }
 }

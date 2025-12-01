@@ -1,13 +1,12 @@
 package org.example;
 
 import jakarta.persistence.*;
-import org.hibernate.annotations.Type;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-public class Class {
+public class GroupClass {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int cid;
@@ -46,7 +45,7 @@ public class Class {
         this.capacity = capacity;
     }
 
-    public Class(String title, int capacity, Availability availability){
+    public GroupClass(String title, int capacity, Availability availability){
         this.title = title;
         this.capacity = capacity;
         this.time = availability;
@@ -54,6 +53,8 @@ public class Class {
         this.room = null;
         participants = new ArrayList<>();
     }
+
+    public  GroupClass(){}
 
     public void addPerson(Member person){
         participants.add(person);

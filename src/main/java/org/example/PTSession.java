@@ -13,4 +13,6 @@ public class PTSession {
     @OneToOne
     private Room room;
 
+    public PTSession(){}
+
 }

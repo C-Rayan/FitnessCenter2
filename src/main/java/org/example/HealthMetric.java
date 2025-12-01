@@ -37,6 +37,8 @@ public class HealthMetric {
         this.member = member;
     }
 
+    public HealthMetric(){}
+
 //    public int getId() {
 //        return id;
 //    }

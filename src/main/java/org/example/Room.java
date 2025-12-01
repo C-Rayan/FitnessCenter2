@@ -14,7 +14,6 @@ public class Room {
     //@OneToOne
     //private PTSession session;
 
-
     public Room(int capacity){
         this.availability = true;
         // default capacity is 30

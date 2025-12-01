@@ -13,7 +13,6 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -23,7 +22,7 @@ public class MemberBooking extends  JFrame {
     private JPanel groupPanel;
     private JPanel ptPanel;
     private JPanel reschedulePanel;
-    private JComboBox<Class> groupComboBox1;
+    private JComboBox<GroupClass> groupComboBox1;
     private JButton registerButton;
     private JTable groupInfoTable;
     private JComboBox<Trainer> trainerComboBox;
@@ -34,9 +33,6 @@ public class MemberBooking extends  JFrame {
     private Session session;
 
     public MemberBooking(Session session, Member user){
-        Trainer t = new Trainer("hans@gmail.com","Han", 1);
-        Availability slot = new Availability(t, LocalDate.now(), LocalTime.now(), LocalTime.now().plusHours(6));
-        Class group1 = new Class("James GUn Party", 2, slot);
         this.session = session;
 
         intializeUI(user);
@@ -48,22 +44,31 @@ public class MemberBooking extends  JFrame {
         setTitle("Main Menu");
         setSize(800, 600);
         setLocationRelativeTo(null);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
 
         //Group tab
         intializeGroup();
+        //Button listeners
         registerButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                Class chosenClass = (Class) groupComboBox1.getSelectedItem();
-                if(chosenClass.getCapacity() ==0){
+                GroupClass chosenGroupClass = (GroupClass) groupComboBox1.getSelectedItem();
+                if(chosenGroupClass.getCapacity() ==0){
                     JOptionPane.showMessageDialog(groupPanel, "Group is full. Pick Another");
                 }
                 else {
-                    user.addClass(chosenClass);
+                    user.addClass(chosenGroupClass);
                     Transaction transaction = session.beginTransaction();
                     session.merge(user);
                     transaction.commit();
                 }
+            }
+        });
+
+        profileBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new ProfileView(user, session).setVisible(true);
             }
         });
 
@@ -87,17 +92,17 @@ public class MemberBooking extends  JFrame {
         TrainerRepo repo = new TrainerRepo();
         List<Trainer> trainers = repo.findAllTrainers(session);
         //Group Booking
-        List<Class> groupSessions = getGroupSessions();
+        List<GroupClass> groupSessions = getGroupSessions();
         groupComboBox1.removeAllItems();
-        for (Class group: groupSessions){
+        for (GroupClass group: groupSessions){
             groupComboBox1.addItem(group);
         }
     }
 
-    private List<Class> getGroupSessions(){
+    private List<GroupClass> getGroupSessions(){
         CriteriaBuilder cb = session.getCriteriaBuilder();
-        CriteriaQuery<Class> cq = cb.createQuery(Class.class);
-        Root<Class> root = cq.from(Class.class);
+        CriteriaQuery<GroupClass> cq = cb.createQuery(GroupClass.class);
+        Root<GroupClass> root = cq.from(GroupClass.class);
         cq.select(root).orderBy(cb.asc(root.get("title")));
         return session.createQuery(cq).getResultList();
     }
@@ -105,8 +110,8 @@ public class MemberBooking extends  JFrame {
     private void refresh(){
         //Refresh Group
         groupInfoTableModel.setRowCount(0);
-        List<Class> groupClasses = getGroupSessions();
-        for (Class group: groupClasses){
+        List<GroupClass> groupGroupClasses = getGroupSessions();
+        for (GroupClass group: groupGroupClasses){
             groupInfoTableModel.addRow(new Object[]{
                     group.getTitle(),
                     group.getTrainer().getName(),
@@ -114,27 +119,6 @@ public class MemberBooking extends  JFrame {
                     group.getTime().getEndTime().format(DateTimeFormatter.ofPattern("HH:mm"))
             });
         }
-
-    }
-
-    public static void main(String[] args) {
-        Configuration config = new Configuration();
-        config.addAnnotatedClass(org.example.Member.class);
-        config.addAnnotatedClass(org.example.Admin.class);
-        config.addAnnotatedClass(org.example.Trainer.class);
-        config.addAnnotatedClass(org.example.Availability.class);
-        config.addAnnotatedClass(org.example.FitnessGoal.class);
-        config.addAnnotatedClass(org.example.HealthMetric.class);
-        config.addAnnotatedClass(org.example.Class.class);
-        config.addAnnotatedClass(org.example.Room.class);
-
-        config.configure("hibernate.cfg.xml");
-
-
-        // Begin a transaction, where changes will occur in the database//
-        SessionFactory sf = config.buildSessionFactory();
-        Session session = sf.openSession();
-        Member jane = new Member("ho@gmail.com", "Jane", "Male", LocalDate.now(), 1);
 
     }
 }

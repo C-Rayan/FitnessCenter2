@@ -27,7 +27,22 @@ public class Member  {
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<FitnessGoal> goals;
     @ManyToMany
-    private List<Class> groupClasses;
+    private List<GroupClass> groupGroupClasses;
+    @ManyToOne
+    @JoinColumn(name = "trainer_id")
+    private Trainer trainer;
+
+    public Member(String email, String name, String gender, LocalDate date, int pass){
+        this.email = email;
+        this.name = name;
+        this.gender = gender;
+        this.pass = pass;
+        //super(email, name, gender);
+        goals = new ArrayList<>();
+        metrics = new ArrayList<>();
+        dateOfBirth = date;
+    }
+    public Member(){}
 
     public int getNumGoals() {
         return numGoals;
@@ -44,12 +59,6 @@ public class Member  {
     public int getNumEntry() {
         return numEntry;
     }
-
-
-    @ManyToOne
-    @JoinColumn(name = "trainer_id")
-    private Trainer trainer;
-
     public String getEmail() {
         return email;
     }
@@ -60,18 +69,6 @@ public class Member  {
 
     public int getPass() {
         return pass;
-    }
-    public Member(){}
-
-    public Member(String email, String name, String gender, LocalDate date, int pass){
-        this.email = email;
-        this.name = name;
-        this.gender = gender;
-        this.pass = pass;
-        //super(email, name, gender);
-        goals = new ArrayList<>();
-        metrics = new ArrayList<>();
-        dateOfBirth = date;
     }
 
     public LocalDate getDateOfBirth() {
@@ -84,26 +81,6 @@ public class Member  {
 
     public List<HealthMetric> getMetrics() {
         return metrics;
-    }
-
-    public void addNewGoal(FitnessGoal goal){
-        if(!goals.contains(goal))
-            goals.add(goal);
-    }
-
-    public void addMetric(HealthMetric metric){
-        this.metrics.add(metric);
-    }
-
-    public void addClass(Class groupClass){
-        groupClasses.add(groupClass);
-        groupClass.addPerson(this);
-    }
-
-    public boolean checkLogIn(String pass) {
-        if (Integer.toString(this.pass).equals(pass))
-            return true;
-        return false;
     }
 
     public String getName() {
@@ -121,8 +98,6 @@ public class Member  {
     public void setGender(String newGender){
         this.gender = newGender;
     }
-
-
     public int getId() {
         return id;
     }
@@ -130,4 +105,26 @@ public class Member  {
     public void setTrainer(Trainer trainer) {
         this.trainer = trainer;
     }
+
+    public void addNewGoal(FitnessGoal goal){
+        if(!goals.contains(goal))
+            goals.add(goal);
+    }
+
+    public void addMetric(HealthMetric metric){
+        this.metrics.add(metric);
+    }
+
+    public void addClass(GroupClass groupClass){
+        groupGroupClasses.add(groupClass);
+        groupClass.addPerson(this);
+    }
+
+    public boolean checkLogIn(String pass) {
+        if (Integer.toString(this.pass).equals(pass))
+            return true;
+        return false;
+    }
+
+
 }

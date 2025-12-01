@@ -22,6 +22,7 @@ public class FitnessGoal {
         this.member = member;
         this.progress = 0;
     }
+    public FitnessGoal(){}
 
     public double getProgress() {
         return progress;

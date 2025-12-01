@@ -29,10 +29,9 @@ public class Trainer {
         availabilities = new ArrayList<>();
         clients = new ArrayList<>();
     }
-
     public Trainer(){}
 
-
+    //Getters and Setters
     public String getName() {
         return name;
     }
@@ -60,20 +59,6 @@ public class Trainer {
     public void setId(int id) {
         this.id = id;
     }
-
-    public List<Member> getClients() {
-        return clients;
-    }
-
-    public void setClients(List<Member> clients) {
-        this.clients = clients;
-    }
-
-    public void addClient(Member m){
-        m.setTrainer(this);
-        clients.add(m);
-    }
-
     public List<Availability> getAvailabilities() {
         return availabilities;
     }
@@ -82,16 +67,24 @@ public class Trainer {
         this.availabilities = availabilities;
     }
 
+    public void setClients(List<Member> clients) {
+        this.clients = clients;
+    }
+    public List<Member> getClients() {
+        return clients;
+    }
+
+    public void addClient(Member m){
+        m.setTrainer(this);
+        clients.add(m);
+    }
+    public boolean checkLogIn(String pass) {
+        return Integer.toString(this.pass).equals(pass);
+    }
     @Override
     public String toString() {
         return "name='" + name + '\'' +
                 ", email='" + email;
-    }
-
-    public boolean checkLogIn(String pass) {
-        if (Integer.toString(this.pass).equals(pass))
-            return true;
-        return false;
     }
 
 }

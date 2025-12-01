@@ -45,6 +45,8 @@ public class Availability { //Possible entity class
         this.reserved = false;
     }
 
+    public  Availability(){}
+
 
     //Getters
     public int getId() {
@@ -63,9 +65,6 @@ public class Availability { //Possible entity class
         return endTime;
     }
 
-    public boolean isRepeats() {
-        return repeats;
-    }
     public void setRepeats(boolean repeats) {
         this.repeats = repeats;
     }
@@ -90,20 +89,19 @@ public class Availability { //Possible entity class
         this.endTime = endTime;
     }
 
-    public boolean overlaps(Availability slot){
-        return  (slot.getdate() == date || slot.getDay() == day) &&(startTime.isBefore(slot.endTime) && endTime.isAfter(slot.startTime));
-    }
-
     public DayOfWeek getDay() {
         return day;
     }
 
-    public boolean isReserved() {
-        return reserved;
-    }
-
     public void setReserved(boolean reserved) {
         this.reserved = reserved;
+    }
+    public boolean overlaps(Availability slot){
+        return  (slot.getdate() == date || slot.getDay() == day) &&(startTime.isBefore(slot.endTime) && endTime.isAfter(slot.startTime));
+    }
+
+    public boolean isReserved() {
+        return reserved;
     }
 
     public boolean isWithin(Availability aClass){

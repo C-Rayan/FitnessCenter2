@@ -17,6 +17,7 @@ public class LoginView extends JFrame  {
     JButton registrationButton;
 
     public LoginView(Session session) {
+        setLocationRelativeTo(null);
         loginFrame = new JFrame();
         mainPanel = new JPanel();
         mainPanel.setName("I'm the main panel");
@@ -102,7 +103,7 @@ public class LoginView extends JFrame  {
                 if (userType.equals("Member")){
                     loginFrame.dispose();
                     //new ProfileView(checkMember, session);
-                    new MemberBooking(session, checkMember);
+                    new MemberBooking(session, checkMember).setVisible(true);
                 }
                 else if (userType.equals("Trainer")){
                     System.out.println("Happening");

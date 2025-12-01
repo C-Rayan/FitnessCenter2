@@ -24,7 +24,7 @@ public class ProfileView extends  JFrame {
     public ProfileView(Member p, Session session){
         setContentPane(ProfilePanel);
         setTitle("Profile Window");
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        //setDefaultCloseOperation();
         setSize(600, 600);
 
         //Sets the correct labels to the user values
