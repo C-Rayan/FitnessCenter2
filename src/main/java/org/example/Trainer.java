@@ -1,15 +1,18 @@
 package org.example;
 
 import jakarta.persistence.*;
-
+import jakarta.persistence.Index;
 import java.util.ArrayList;
 import java.util.List;
 
+
 @Entity
+@Table(indexes = @Index(name = "idx_traemail", columnList = "email"))
 public class Trainer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+
     @Column(unique = true, nullable = false)
     private String email;
     private String name;

@@ -13,7 +13,8 @@ public class Availability { //Possible entity class
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     @ManyToOne
-    @JoinColumn(name = "trainer_id", nullable = false)
+    //@JoinColumn(name = "trainer_id", nullable = false)
+    @JoinColumn(name = "trainer_id", nullable = true)
     private Trainer trainer;
     private LocalDate date;
     private DayOfWeek day;
@@ -21,7 +22,7 @@ public class Availability { //Possible entity class
     private LocalTime endTime;
     private boolean repeats;
 
-    public  Availability(Trainer trainer, LocalDate date, LocalTime start, LocalTime end){
+    public Availability(Trainer trainer, LocalDate date, LocalTime start, LocalTime end){
         //this.id = id;
         this.trainer = trainer;
         this.date = date;

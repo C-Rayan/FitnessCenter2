@@ -80,17 +80,20 @@ public class LoginView extends JFrame  {
 
         loginButton.addActionListener(e -> {
             Transaction checkLogin = session.beginTransaction();
-            Member checkMember = session.find(Member.class, putEmail.getText());
-            Trainer checkTrainer = session.find(Trainer.class, putEmail.getText());
-            Admin checkAdmin = session.find(Admin.class, putEmail.getText());
+            Member checkMember = session.createQuery("From Member tra where tra.email = :email", Member.class).setParameter("email", putEmail.getText()).uniqueResult();
+            // Have to use an SQL query to find by email, but use an index to increase lookup time
+            Trainer checkTrainer = session.createQuery("From Trainer tra where tra.email = :email", Trainer.class).setParameter("email", putEmail.getText()).uniqueResult();
+            Admin checkAdmin = null;//session.find(Admin.class, putEmail.getText());
             boolean loggedIn = false;
             String userType = "";
             // Check if any user with those details exists
             if (checkMember != null){
-                loggedIn = checkMember.checkLogIn(String.valueOf(putPass.getText())); userType = "Member";}
-            if (checkTrainer != null){
-                loggedIn = checkTrainer.checkLogIn(String.valueOf(putPass.getText())); userType = "Trainer";}
-            if (checkAdmin != null){
+                loggedIn = checkMember.checkLogIn(String.valueOf(putPass.getText()));
+                userType = "Member";}
+           else if (checkTrainer != null){
+                loggedIn = checkTrainer.checkLogIn(String.valueOf(putPass.getText()));
+                userType = "Trainer";}
+           else if (checkAdmin != null){
                 loggedIn = checkAdmin.checkLogIn(String.valueOf(putPass.getText())); userType = "Admin";}
 
             // Close transaction
@@ -100,12 +103,11 @@ public class LoginView extends JFrame  {
                     loginFrame.dispose();
                     new ProfileView(checkMember, session);
                 }
-            }
-            else {
-                JLabel warning = new JLabel();
-                warning.setText("Something went wrong");
-                putEmail.setText("");
-                putPass.setText("");
+                else if (userType.equals("Trainer")){
+                    System.out.println("Happening");
+                    loginFrame.dispose();
+                    new TrainerSchedulerGUI(session, checkTrainer).setVisible(true);
+                }
             }
         });
 

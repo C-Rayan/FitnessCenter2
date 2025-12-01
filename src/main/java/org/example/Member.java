@@ -7,17 +7,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Table(indexes = @Index(name = "idx_mememail", columnList = "email"))
 public class Member  {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+
     private String email;
     private String name;
     private String gender;
     private int pass;
     private LocalDate dateOfBirth;
     private int numEntry = 0;
-
     private int numGoals = 0;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
@@ -41,8 +42,6 @@ public class Member  {
     public int getNumEntry() {
         return numEntry;
     }
-
-
 
 
     @ManyToOne
@@ -102,10 +101,6 @@ public class Member  {
 
     public String getName() {
         return name;
-    }
-
-    public int getId() {
-        return id;
     }
 
     public void setName(String newName) {

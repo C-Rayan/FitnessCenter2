@@ -80,6 +80,7 @@ public class AvailabiltyRepo {
         return session.createQuery(cq).getResultList();
     }
 
+
     public void saveAvailability(Session session, Availability availability){
         Transaction transaction = session.beginTransaction();
         session.persist(availability);

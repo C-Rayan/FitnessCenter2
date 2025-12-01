@@ -22,7 +22,6 @@ public class ProfileView extends  JFrame {
     private JScrollPane metricScrollPane;
 
     public ProfileView(Member p, Session session){
-        Member currMember = session.find(Member.class,  p.getEmail());
         setContentPane(ProfilePanel);
         setTitle("Profile Window");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -82,7 +81,7 @@ public class ProfileView extends  JFrame {
 
         name.addActionListener(e ->{
             String newName = JOptionPane.showInputDialog(options, "Enter your new name", "Customized Dialog", JOptionPane.PLAIN_MESSAGE);
-            if (newName.length() > 1) {
+            if (newName.length() > 2) {
                 nameLbl.setText(newName);
                 JOptionPane.showMessageDialog(options, "Your name was successfully updated");
                 session.beginTransaction();
@@ -101,6 +100,20 @@ public class ProfileView extends  JFrame {
             p.setGender((String) genderse[chosen]);
             session.getTransaction().commit();
         });
+
+        email.addActionListener(e ->{
+            String newEmail = JOptionPane.showInputDialog(options, "Enter your new email", "Customized Dialog", JOptionPane.PLAIN_MESSAGE);
+            if (newEmail.length() > 2 && newEmail.contains("@") && newEmail.contains(".")) {
+                emailTxt.setText(newEmail);
+                JOptionPane.showMessageDialog(options, "Your email was successfully updated");
+                session.beginTransaction();
+                p.setEmail(newEmail);
+                session.getTransaction().commit();
+            }
+            else
+                JOptionPane.showMessageDialog(options, "Oops, something went wrong, please try again");
+        });
+
 
 
         addFitnessGoal.addActionListener(e -> {
@@ -279,7 +292,6 @@ public class ProfileView extends  JFrame {
                 });
             }
         });
-
 
         setVisible(true);
     }

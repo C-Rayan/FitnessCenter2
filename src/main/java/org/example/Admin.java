@@ -1,17 +1,19 @@
 package org.example;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 @Entity
 public class Admin {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
+
     @Column(unique = true, nullable = false)
     private String email;
     private String name;
     private int pass;
+
+
 
     public Admin(String email, String name, int pass) {
         this.email = email;

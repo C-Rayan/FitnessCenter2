@@ -279,7 +279,8 @@ public class TrainerSchedulerGUI extends JFrame {
         // Try to restore selection if possible
         if (client != null) {
             for (int i = 0; i < memberComboBox.getItemCount(); i++) {
-                if (memberComboBox.getItemAt(i).getId() == client.getId()) {
+                // CHANGE BACK TO .getID() LATER REMEMBER
+                if (memberComboBox.getItemAt(i).getEmail() == client.getEmail()) {
                     memberComboBox.setSelectedIndex(i);
                     break;
                 }
@@ -346,7 +347,8 @@ public class TrainerSchedulerGUI extends JFrame {
 
         for (Member member : members) {
             tableModel.addRow(new Object[]{
-                    member.getId(),
+                    // UNCOMMENT LATER
+                    //member.getId(),
                     member.getName(),
                     member.getEmail(),
                     "Delete"
@@ -507,20 +509,24 @@ public class TrainerSchedulerGUI extends JFrame {
 
     }
 
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
         Configuration config = new Configuration();
         config.addAnnotatedClass(org.example.Member.class);
         config.addAnnotatedClass(org.example.Admin.class);
         config.addAnnotatedClass(org.example.Trainer.class);
         config.addAnnotatedClass(org.example.Availability.class);
+        config.addAnnotatedClass(org.example.FitnessGoal.class);
+        config.addAnnotatedClass(org.example.HealthMetric.class);
+
         config.configure("hibernate.cfg.xml");
+
 
         // Begin a transaction, where changes will occur in the database//
         SessionFactory sf = config.buildSessionFactory();
         Session session = sf.openSession();
         Trainer t = new Trainer("hans@gmail.com","Han", 1);
         new TrainerSchedulerGUI(session,t).setVisible(true);
-    }
+    }*/
 }
 
 

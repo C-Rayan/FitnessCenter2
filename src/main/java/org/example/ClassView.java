@@ -1,0 +1,288 @@
+package org.example;
+
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
+import org.hibernate.Session;
+
+import javax.swing.*;
+import java.awt.*;
+import java.time.*;
+import java.util.List;
+
+import static org.example.GeneralController.generalFunctions.beautifyTexts;
+
+public class ClassView extends JFrame {
+    private Session session;
+    private JScrollPane classScroll;
+    private JMenuBar createClass;
+    private JMenu addClass;
+    private JMenu goToPt;
+    private boolean recurringTime;
+    private LocalTime startTime;
+    private LocalTime endTime;
+    private DayOfWeek day;
+    private JTextField title;
+    private JTextField size;
+    private AvailabiltyRepo availabiltyRepo;
+    private Class myClass;
+    private Availability newSlot;
+    private JPanel classPanel;
+    public ClassView(Session session){
+        availabiltyRepo = new AvailabiltyRepo();
+        this.myClass = myClass;
+
+        this.setResizable(true);
+        this.session = session;
+        classPanel = new JPanel(new BoxLayout(classPanel, BoxLayout.Y_AXIS));
+        classScroll = new JScrollPane(classPanel);
+        this.setSize(800, 500);
+
+        createClass = new JMenuBar();
+        addClass = new JMenu();
+        goToPt = new JMenu();
+        addClass.setText("Add a new class"); goToPt.setText("View PT sessions");
+        createClass.add(addClass);
+        createClass.add(goToPt);
+
+        JMenuItem addWeeklyClass = new JMenuItem("Add a new weekly class");
+        JMenuItem addOnceOverClass = new JMenuItem("Add a one-time class");
+        addClass.add(addWeeklyClass);
+        addClass.add(addOnceOverClass);
+
+        this.setJMenuBar(createClass);
+
+        addWeeklyClass.addActionListener(f -> {
+            recurringTime = true;
+            createAddClass(addClass);
+            addClass.setVisible(false);
+        });
+        addOnceOverClass.addActionListener(f -> {
+            recurringTime = false;
+            createAddClass(addClass);
+            addClass.setVisible(false);
+        });
+
+        this.setVisible(true);
+        classScroll.setVisible(true);
+    }
+
+    public void createAddClass(JMenu addclass){
+        this.setSize(400, 400);
+        this.setResizable(false);
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
+        title = new JTextField(15);
+        title.setText("Enter class name");
+        size = new JTextField(7);
+        size.setText("Enter size");
+        JButton addButton = new JButton();
+        addButton.setText("Add it!");
+
+
+        title.setMaximumSize(title.getPreferredSize());
+        size.setMaximumSize(size.getPreferredSize());
+        title.setAlignmentX(Component.CENTER_ALIGNMENT);
+        size.setAlignmentX(Component.CENTER_ALIGNMENT);
+        addButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        panel.add(Box.createRigidArea(new Dimension(0, 20)));
+        panel.add(title); panel.add(Box.createRigidArea(new Dimension(0, 20)));
+        panel.add(size); panel.add(Box.createRigidArea(new Dimension(0, 20)));
+        if (recurringTime)
+            RecurringTimeView(panel);
+        else
+            onceOverView(panel);
+
+        this.setContentPane(panel);
+        goBackToMainMenu();
+
+        JTextField[] texts = {title, size};
+        beautifyTexts(texts);
+    }
+
+
+    public void addClass(){
+        if (title.getText().trim().length() <= 8 || title.getText().trim().length() >= 40){
+                JOptionPane.showMessageDialog(this, "Please keep your title between 8-40 characters");
+        }
+        else if (newSlot == null){
+            JOptionPane.showMessageDialog(this, "This time overlaps another class, try again");
+        }
+        else {
+            try {
+                System.out.println("Something happened maybe?");
+                    // This will still update the PK, even if it didn't add
+                    Class newClass = new Class(title.getText().trim(), Integer.parseInt(size.getText().trim()), newSlot);
+                    session.beginTransaction();
+                    session.persist(newClass);
+                    session.getTransaction().commit();
+                    title.setText("Enter class name");
+                    title.setOpaque(false);
+                    size.setText("Enter size");
+                    size.setOpaque(false);
+                    JOptionPane.showMessageDialog(this, "This class has been succesfully created!");
+                    addRecClassGui();
+                } catch (org.hibernate.exception.ConstraintViolationException s) {
+                    // Couldn't persist it since its not unique, so revert to previous state
+                    session.getTransaction().rollback();
+                    JOptionPane.showMessageDialog(this, "You already have this class!");
+                } catch (NumberFormatException s) {
+                    JOptionPane.showMessageDialog(this, "Please enter a proper size!");
+                }
+            }
+        }
+
+
+        public void addRecClassGui(){
+            JPanel indClassPanel = new JPanel();
+            //indClassPanel.setLayout();
+            indClassPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
+
+            JLabel name = new JLabel();
+            name.setText(title.getText());
+            indClassPanel.add(name);
+            //classScroll.add(indClassPanel);
+        }
+
+    public void addRecAvailability(DayOfWeek day, LocalTime startTime, LocalTime endTime){
+        //Checks that slot is at least 10min
+        Duration diff = Duration.between(startTime, endTime);
+        if (diff.toMinutes() < 10 || diff.toMinutes() > 180) {
+            throw new IllegalArgumentException("Time slot should be at least 10min");
+        }
+        // Don't allocate trainer initially, only after
+        newSlot = new Availability(null, day, startTime, endTime);
+        //check for overlaps
+        List<Availability> existingSlots = findRepeatingAvailibilityByClassAndDay(day);
+        for (Availability current: existingSlots){
+            if(newSlot.overlaps(current)) {
+                newSlot = null;
+            }
+        }
+        // Don't remvoe this line, doesn't work without
+        System.out.println(newSlot == null);
+        addClass();
+    }
+
+    public void addOnceAvailability(LocalDate day, LocalTime startTime, LocalTime endTime){
+        //Checks that slot is at least 10min
+        Duration diff = Duration.between(startTime, endTime);
+        if (diff.toMinutes() < 10 || diff.toMinutes() > 180) {
+            throw new IllegalArgumentException("Time slot should be at least 10min");
+        }
+        // Don't allocate trainer initially, only after
+        newSlot = new Availability(null, day, startTime, endTime);
+        //check for overlaps
+        List<Availability> existingSlots = findRepeatingAvailibilityByClassAndDate(day);
+        for (Availability current: existingSlots){
+            if(newSlot.overlaps(current)) {
+                newSlot = null;
+            }
+        }
+        // Don't remvoe this line, doesn't work without
+        System.out.println(newSlot == null);
+        addClass();
+    }
+
+
+        public void RecurringTimeView(JPanel inputPanel){
+            JComboBox<DayOfWeek> dayComboBox = new JComboBox<>(DayOfWeek.values());
+            JSpinner startTimeSpinner = new JSpinner(new SpinnerDateModel());
+            JSpinner.DateEditor startTimeEditor = new JSpinner.DateEditor(startTimeSpinner, "HH:mm");
+            startTimeSpinner.setEditor(startTimeEditor);
+
+            JSpinner endTimeSpinner = new JSpinner(new SpinnerDateModel());
+            JSpinner.DateEditor endTimeEditor = new JSpinner.DateEditor(endTimeSpinner, "HH:mm");
+            endTimeSpinner.setEditor(endTimeEditor);
+
+            inputPanel.add(new JLabel("Day:"));
+            inputPanel.add(dayComboBox);
+            inputPanel.add(new JLabel("Start Time:"));
+            inputPanel.add(startTimeSpinner);
+            inputPanel.add(new JLabel("End Time:"));
+            inputPanel.add(endTimeSpinner);
+            JButton addButton = new JButton();
+            addButton.setText("Add it!");
+            addButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+            inputPanel.add(addButton);
+            addButton.addActionListener(e ->{
+                getRecurringTime(dayComboBox, startTimeSpinner, endTimeSpinner);
+            });
+
+        }
+
+        public void getRecurringTime(JComboBox<DayOfWeek> dayComboBox, JSpinner startTimeSpinner, JSpinner endTimeSpinner){
+            addRecAvailability(
+                    (DayOfWeek) dayComboBox.getSelectedItem(),
+                    ((SpinnerDateModel) startTimeSpinner.getModel()).getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalTime(),
+                    ((SpinnerDateModel) endTimeSpinner.getModel()).getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalTime()
+            );
+        }
+
+        // Returns all rows from the availability table that match the day
+        public List<Availability> findRepeatingAvailibilityByClassAndDay(DayOfWeek day){
+            CriteriaBuilder cb = session.getCriteriaBuilder();
+            CriteriaQuery<Availability> cq = cb.createQuery(Availability.class);
+            Root<Availability> root = cq.from(Availability.class);
+            // Gets all rows with the same days and sorts them by start time
+            cq.where(cb.equal(root.get("day"), day));
+            cq.orderBy(cb.asc(root.get("startTime")));
+
+            return session.createQuery(cq).getResultList();
+        }
+    public List<Availability> findRepeatingAvailibilityByClassAndDate(LocalDate day){
+        CriteriaBuilder cb = session.getCriteriaBuilder();
+        CriteriaQuery<Availability> cq = cb.createQuery(Availability.class);
+        Root<Availability> root = cq.from(Availability.class);
+        // Gets all rows with the same days and sorts them by start time
+        cq.where(cb.equal(root.get("day"), day));
+        cq.orderBy(cb.asc(root.get("startTime")));
+
+        return session.createQuery(cq).getResultList();
+    }
+
+
+
+    public void goBackToMainMenu(){
+        JMenu returnt = new JMenu("Return to main menu");
+        JMenuItem item = new JMenuItem("Click to leave");
+        returnt.add(item);
+        this.getJMenuBar().add(returnt);
+
+        item.addActionListener(f ->{
+            this.setContentPane(classScroll);
+            addClass.setVisible(true);
+            this.setResizable(true);
+            this.setSize(800, 500);
+            this.getJMenuBar().remove(returnt);
+        });
+    }
+
+        public void onceOverView(JPanel inputPanel){
+            JSpinner startDateTimeSpinner = new JSpinner(new SpinnerDateModel());
+            JSpinner.DateEditor startDateTimeEditor = new JSpinner.DateEditor(startDateTimeSpinner, "yyyy-MM-dd HH:mm");
+            startDateTimeSpinner.setEditor(startDateTimeEditor);
+
+            JSpinner endDateTimeSpinner = new JSpinner(new SpinnerDateModel());
+            JSpinner.DateEditor endDateTimeEditor = new JSpinner.DateEditor(endDateTimeSpinner, "yyyy-MM-dd HH:mm");
+            endDateTimeSpinner.setEditor(endDateTimeEditor);
+
+            inputPanel.add(new JLabel("Start Date/Time:"));
+            inputPanel.add(startDateTimeSpinner);
+            inputPanel.add(new JLabel("End Date/Time:"));
+            inputPanel.add(endDateTimeSpinner);
+            JButton addButton = new JButton();
+            addButton.setText("Add it!");
+            addButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+            inputPanel.add(addButton);
+            addButton.addActionListener(e ->{
+
+            });
+
+        }
+
+
+
+}
+
