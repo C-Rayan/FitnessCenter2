@@ -110,4 +110,12 @@ public class Availability { //Possible entity class
         return (aClass.getdate() == date || aClass.getDay() == day) && (!aClass.startTime.isBefore(startTime) && !aClass.endTime.isAfter(endTime));
     }
 
+    @Override
+    public String toString() {
+        return "Trainer=" + trainer +
+                ", date=" + date +
+                ", day=" + day +
+                ", startTime=" + startTime +
+                ", endTime=" + endTime;
+    }
 }

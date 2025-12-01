@@ -30,6 +30,10 @@ public class ClassView extends JFrame {
     private Availability newSlot;
     private JPanel classPanel;
     private JPanel listClass;
+    private JLabel availL;
+
+
+
     public ClassView(Session session){
         availabiltyRepo = new AvailabiltyRepo();
         this.myClass = myClass;
@@ -83,26 +87,49 @@ public class ClassView extends JFrame {
         classRow.setLayout(new BoxLayout(classRow, BoxLayout.X_AXIS));
         JLabel lTitle = new JLabel("Name: " + newClass.getTitle());
         JLabel lSize = new JLabel("Capacity: " + String.valueOf(newClass.getCapacity()));
+        availL = new JLabel(newClass.getTime().toString());
         JButton addTrainer = new JButton("Assign a trainer to this class");
         JButton addRoom = new JButton("Assign a room to this class");
+
+
+
         classRow.add(lTitle); classRow.add(Box.createHorizontalGlue());
         classRow.add(lSize); classRow.add(Box.createHorizontalGlue());
+        classRow.add(availL); classRow.add(Box.createHorizontalGlue());
         classRow.add(addTrainer); classRow.add(Box.createHorizontalGlue());
         classRow.add(addRoom);
+
         addTrainer.addActionListener(e ->{
+            // The name of each row is the ID it corresponds to
             int classID = Integer.parseInt(classRow.getName());
-            assignTrainer(classID);
+            Class checkClass = session.find(Class.class, classID);
+            boolean tSucc = assignTrainer(checkClass);
+            if (tSucc) {
+                System.out.println("Hapenning");
+                addTrainer.setVisible(false);
+                availL.setText(checkClass.getTime().toString());
+            }
+        });
+
+        addRoom.addActionListener(e ->{
+            int classID = Integer.parseInt(classRow.getName());
+            Class checkClass = session.find(Class.class, classID);
+            boolean rSucc = assignRoom(checkClass);
+            if (rSucc) {
+                addRoom.setVisible(false);
+                JLabel rLbl = new JLabel(checkClass.getRoom().toString());
+                classRow.add(rLbl);
+            }
         });
         listClass.add(classRow);
     }
 
-    public void assignTrainer(int classID) {
+    public boolean assignTrainer(Class checkClass) {
         try{
             // Bit of wasted space, but couldn't figure out another way
             ArrayList<Availability> validBilities = new ArrayList<>();
             // Need to get all the trainer's availability slots
             ArrayList<Trainer> validTrainers = new ArrayList<>();
-            Class checkClass = session.find(Class.class, classID);
             List<Availability> AVT = getALlTrainsAvails();
             // Go thru each availability that belongs to a trainer
             for (Availability avt : AVT){
@@ -115,6 +142,7 @@ public class ClassView extends JFrame {
             // Long line, but justs shows a dialog that lets you pick a trainer that is available
             Trainer trainer = (Trainer) JOptionPane.showInputDialog(this, "Please choose the preferred available trainers", "Something",  JOptionPane.QUESTION_MESSAGE, null, validTrainers.toArray(), validTrainers.getFirst());
             int index = -1;
+            // This is slow, should be changed later on for faster lookup
             for (int i = 0; i < validTrainers.size(); i++){
                     if (validTrainers.get(i).getId() == trainer.getId()) {
                         index = i;
@@ -125,13 +153,33 @@ public class ClassView extends JFrame {
                 session.beginTransaction();
                 AVT.get(index).setReserved(true);
                 checkClass.setTrainer(trainer);
+                checkClass.setTime(AVT.get(index));
                 session.getTransaction().commit();
-            };
-
+                return true;
+            }
+            return false;
         }
         // Catch unnacounted for exceptions
         catch (Exception e){
             new JOptionPane("Uh oh, something went wrong :(");
+            return false;
+        }
+    }
+
+    public boolean assignRoom(Class checkClass){
+        try{
+            List<Room> availableRooms = getAllAvailRooms();
+            Room room = (Room) JOptionPane.showInputDialog(this, "Please choose an available room", "Something",  JOptionPane.QUESTION_MESSAGE, null, availableRooms.toArray(), availableRooms.getFirst());
+            // Add room and make it unavailable for next person
+            session.beginTransaction();
+            checkClass.setRoom(room);
+            checkClass.getRoom().setAvailability(false);
+            session.getTransaction().commit();
+            return true;
+        }
+        // Maybe something went wrong, so don't remove the button
+        catch (Exception e){
+            return false;
         }
     }
 
@@ -362,6 +410,17 @@ public class ClassView extends JFrame {
         // SELECT from all availabilities WHERE trainer_id is set
         // This means the availability belongs to a trainer, rather than a class
         cq.select(root).where(cb.isNotNull(root.get("trainer")));
+        return session.createQuery(cq).getResultList();
+    }
+
+    public List<Room> getAllAvailRooms(){
+        CriteriaBuilder cb = session.getCriteriaBuilder();
+        CriteriaQuery<Room> cq = cb.createQuery(Room.class);
+        Root<Room> root = cq.from(Room.class);
+        // SELECT from all availabilities WHERE trainer_id is set
+        // This means the availability belongs to a trainer, rather than a class
+        cq.select(root).where(cb.isTrue(root.get("availability")));
+        System.out.println(session.createQuery(cq).getResultList().size());
         return session.createQuery(cq).getResultList();
     }
 
