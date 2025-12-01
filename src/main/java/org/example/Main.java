@@ -31,12 +31,19 @@ public class Main {
         //LoginView view = new LoginView(session);
         new ClassView(session);
         Member p1 = new Member("bob@gmail.com", "Bob", "Male", LocalDate.now(), 1000);
-        Trainer t = new Trainer("hans@gmail.com","Han", 1);
-        Availability av1 = new Availability(t, DayOfWeek.MONDAY, LocalTime.of(9, 20, 30), LocalTime.of(10, 20, 30));
-        t.getAvailabilities().add(av1);
+        Member p2 = new Member("sally@gmail.com", "Sally", "Female", LocalDate.now(), 1002);
+        Trainer t1 = new Trainer("hans@gmail.com","Han", 1);
+        Trainer t2 = new Trainer("Ron@hotmail.com", "Ronny", 12);
+        Admin a1 = new Admin("Holly@yahoo.com", "Holly", 2000);
+        Admin a2 = new Admin("Will@wiz.com", "Will", 2003);
+
+        Availability av1 = new Availability(t1, DayOfWeek.MONDAY, LocalTime.of(9, 20, 30), LocalTime.of(10, 20, 30));
+        t1.getAvailabilities().add(av1);
         session.beginTransaction();
         session.persist(av1);
-        session.persist(p1); session.persist(t);
+        session.persist(p1); session.persist(p2);
+        session.persist(t1); session.persist(t2);
+        session.persist(a1); session.persist(a2);
         session.getTransaction().commit();
         //HealthMetric m1 = new HealthMetric("bob@gmail.con", "1", LocalDate.now(), 150,180, 69);
         //HealthMetric m2 = new HealthMetric("bob@gmail.con", "2", LocalDate.now(), 150,180, 70);

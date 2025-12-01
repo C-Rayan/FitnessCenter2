@@ -82,7 +82,7 @@ public class Trainer {
 
     @Override
     public String toString() {
-        return "Member{" +
+        return "Trainer{" +
                 "name='" + name + '\'' +
                 ", email='" + email + '\'' +
                 '}';

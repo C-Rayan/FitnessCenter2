@@ -55,4 +55,12 @@ public class Class {
     public void setTime(Availability time) {
         this.time = time;
     }
+
+    public Trainer getTrainer() {
+        return trainer;
+    }
+
+    public void setTrainer(Trainer trainer) {
+        this.trainer = trainer;
+    }
 }

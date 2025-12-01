@@ -21,6 +21,7 @@ public class Availability { //Possible entity class
     private LocalTime startTime;
     private LocalTime endTime;
     private boolean repeats;
+    private boolean reserved;
 
     public Availability(Trainer trainer, LocalDate date, LocalTime start, LocalTime end){
         //this.id = id;
@@ -30,6 +31,7 @@ public class Availability { //Possible entity class
         this.startTime = start;
         this.endTime = end;
         this.repeats = false;
+        this.reserved = false;
     }
 
     public Availability(Trainer trainer, DayOfWeek day, LocalTime startTime, LocalTime endTime) {
@@ -40,6 +42,7 @@ public class Availability { //Possible entity class
         this.startTime = startTime;
         this.endTime = endTime;
         repeats = true;
+        this.reserved = false;
     }
 
     //Getters
@@ -94,8 +97,17 @@ public class Availability { //Possible entity class
         return day;
     }
 
+    public boolean isReserved() {
+        return reserved;
+    }
+
+    public void setReserved(boolean reserved) {
+        this.reserved = reserved;
+    }
+
     public boolean isWithin(Availability aClass){
         // Checks if the class interval is inside the trainer's allowed time
-        return (!aClass.startTime.isBefore(startTime) && !aClass.endTime.isAfter(endTime));
+        return (aClass.getdate() == date || aClass.getDay() == day) && (!aClass.startTime.isBefore(startTime) && !aClass.endTime.isAfter(endTime));
     }
+
 }

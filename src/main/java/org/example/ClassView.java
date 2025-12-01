@@ -8,6 +8,7 @@ import org.hibernate.Session;
 import javax.swing.*;
 import java.awt.*;
 import java.time.*;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.example.GeneralController.generalFunctions.beautifyTexts;
@@ -92,26 +93,45 @@ public class ClassView extends JFrame {
             int classID = Integer.parseInt(classRow.getName());
             assignTrainer(classID);
         });
-
-
         listClass.add(classRow);
     }
 
     public void assignTrainer(int classID) {
         try{
+            // Bit of wasted space, but couldn't figure out another way
+            ArrayList<Availability> validBilities = new ArrayList<>();
             // Need to get all the trainer's availability slots
+            ArrayList<Trainer> validTrainers = new ArrayList<>();
             Class checkClass = session.find(Class.class, classID);
             List<Availability> AVT = getALlTrainsAvails();
-            /* Go thru all the trainers availabilities
-             */
+            // Go thru each availability that belongs to a trainer
             for (Availability avt : AVT){
-                if (avt.isWithin(checkClass.getTime())){
-                    System.out.println(avt.getTrainer().getName());
+                // If the class can fit completely in a trainer's time, then that trainer is a valid choice
+                if (avt.isWithin(checkClass.getTime()) && !avt.isReserved()){
+                    validTrainers.add(avt.getTrainer());
+                    validBilities.add(avt);
                 }
             }
+            // Long line, but justs shows a dialog that lets you pick a trainer that is available
+            Trainer trainer = (Trainer) JOptionPane.showInputDialog(this, "Please choose the preferred available trainers", "Something",  JOptionPane.QUESTION_MESSAGE, null, validTrainers.toArray(), validTrainers.getFirst());
+            int index = -1;
+            for (int i = 0; i < validTrainers.size(); i++){
+                    if (validTrainers.get(i).getId() == trainer.getId()) {
+                        index = i;
+                        break;
+                    }
+            }
+            if (index != -1) {
+                session.beginTransaction();
+                AVT.get(index).setReserved(true);
+                checkClass.setTrainer(trainer);
+                session.getTransaction().commit();
+            };
+
         }
+        // Catch unnacounted for exceptions
         catch (Exception e){
-            e.printStackTrace();
+            new JOptionPane("Uh oh, something went wrong :(");
         }
     }
 
@@ -147,10 +167,12 @@ public class ClassView extends JFrame {
         goBackToMainMenu();
 
         JTextField[] texts = {title, size};
+        // Just makes text fields look nice, that's it
         beautifyTexts(texts);
     }
 
 
+    // Add the class if it doesn't overlap any other classes
     public void addClass(){
         if (title.getText().trim().length() <= 8 || title.getText().trim().length() >= 40){
                 JOptionPane.showMessageDialog(this, "Please keep your title between 8-40 characters");
@@ -202,6 +224,7 @@ public class ClassView extends JFrame {
         addClass();
     }
 
+    // Almost the top as same function, except we cross references dates
     public void addOnceAvailability(LocalDate date, LocalTime startTime, LocalTime endTime){
         //Checks that slot is at least 10min
         Duration diff = Duration.between(startTime, endTime);
@@ -263,6 +286,7 @@ public class ClassView extends JFrame {
             CriteriaQuery<Availability> cq = cb.createQuery(Availability.class);
             Root<Availability> root = cq.from(Availability.class);
             // Gets all rows with the same days and sorts them by start time
+            // Make sure that the time belongs to a class, and not a trainer
             cq.where(
                     cb.and(
                             cb.equal(root.get("day"), day),
@@ -279,6 +303,7 @@ public class ClassView extends JFrame {
         CriteriaQuery<Availability> cq = cb.createQuery(Availability.class);
         Root<Availability> root = cq.from(Availability.class);
         // Gets all rows with the same days and sorts them by start time
+        // Also makes sure that the time belongs to a trainer, and not a class
         cq.where(
                 cb.and(
                         cb.equal(root.get("date"), date),
@@ -335,6 +360,7 @@ public class ClassView extends JFrame {
         CriteriaQuery<Availability> cq = cb.createQuery(Availability.class);
         Root<Availability> root = cq.from(Availability.class);
         // SELECT from all availabilities WHERE trainer_id is set
+        // This means the availability belongs to a trainer, rather than a class
         cq.select(root).where(cb.isNotNull(root.get("trainer")));
         return session.createQuery(cq).getResultList();
     }
