@@ -34,8 +34,7 @@ public class ClassView extends JFrame {
 
         this.setResizable(true);
         this.session = session;
-        classPanel = new JPanel(new BoxLayout(classPanel, BoxLayout.Y_AXIS));
-        classScroll = new JScrollPane(classPanel);
+        classScroll = new JScrollPane();
         this.setSize(800, 500);
 
         createClass = new JMenuBar();
@@ -122,7 +121,6 @@ public class ClassView extends JFrame {
                     size.setText("Enter size");
                     size.setOpaque(false);
                     JOptionPane.showMessageDialog(this, "This class has been succesfully created!");
-                    addRecClassGui();
                 } catch (org.hibernate.exception.ConstraintViolationException s) {
                     // Couldn't persist it since its not unique, so revert to previous state
                     session.getTransaction().rollback();
@@ -133,17 +131,6 @@ public class ClassView extends JFrame {
             }
         }
 
-
-        public void addRecClassGui(){
-            JPanel indClassPanel = new JPanel();
-            //indClassPanel.setLayout();
-            indClassPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
-
-            JLabel name = new JLabel();
-            name.setText(title.getText());
-            indClassPanel.add(name);
-            //classScroll.add(indClassPanel);
-        }
 
     public void addRecAvailability(DayOfWeek day, LocalTime startTime, LocalTime endTime){
         //Checks that slot is at least 10min
@@ -165,16 +152,16 @@ public class ClassView extends JFrame {
         addClass();
     }
 
-    public void addOnceAvailability(LocalDate day, LocalTime startTime, LocalTime endTime){
+    public void addOnceAvailability(LocalDate date, LocalTime startTime, LocalTime endTime){
         //Checks that slot is at least 10min
         Duration diff = Duration.between(startTime, endTime);
         if (diff.toMinutes() < 10 || diff.toMinutes() > 180) {
             throw new IllegalArgumentException("Time slot should be at least 10min");
         }
         // Don't allocate trainer initially, only after
-        newSlot = new Availability(null, day, startTime, endTime);
+        newSlot = new Availability(null, date, startTime, endTime);
         //check for overlaps
-        List<Availability> existingSlots = findRepeatingAvailibilityByClassAndDate(day);
+        List<Availability> existingSlots = findRepeatingAvailibilityByClassAndDate(date);
         for (Availability current: existingSlots){
             if(newSlot.overlaps(current)) {
                 newSlot = null;
@@ -230,36 +217,20 @@ public class ClassView extends JFrame {
             cq.orderBy(cb.asc(root.get("startTime")));
 
             return session.createQuery(cq).getResultList();
-        }
-    public List<Availability> findRepeatingAvailibilityByClassAndDate(LocalDate day){
+    }
+
+    public List<Availability> findRepeatingAvailibilityByClassAndDate(LocalDate date){
         CriteriaBuilder cb = session.getCriteriaBuilder();
         CriteriaQuery<Availability> cq = cb.createQuery(Availability.class);
         Root<Availability> root = cq.from(Availability.class);
         // Gets all rows with the same days and sorts them by start time
-        cq.where(cb.equal(root.get("day"), day));
+        cq.where(cb.equal(root.get("date"), date));
         cq.orderBy(cb.asc(root.get("startTime")));
 
         return session.createQuery(cq).getResultList();
     }
 
-
-
-    public void goBackToMainMenu(){
-        JMenu returnt = new JMenu("Return to main menu");
-        JMenuItem item = new JMenuItem("Click to leave");
-        returnt.add(item);
-        this.getJMenuBar().add(returnt);
-
-        item.addActionListener(f ->{
-            this.setContentPane(classScroll);
-            addClass.setVisible(true);
-            this.setResizable(true);
-            this.setSize(800, 500);
-            this.getJMenuBar().remove(returnt);
-        });
-    }
-
-        public void onceOverView(JPanel inputPanel){
+    public void onceOverView(JPanel inputPanel){
             JSpinner startDateTimeSpinner = new JSpinner(new SpinnerDateModel());
             JSpinner.DateEditor startDateTimeEditor = new JSpinner.DateEditor(startDateTimeSpinner, "yyyy-MM-dd HH:mm");
             startDateTimeSpinner.setEditor(startDateTimeEditor);
@@ -277,10 +248,34 @@ public class ClassView extends JFrame {
             addButton.setAlignmentX(Component.CENTER_ALIGNMENT);
             inputPanel.add(addButton);
             addButton.addActionListener(e ->{
-
+                getOnceTime(startDateTimeSpinner, endDateTimeSpinner);
             });
+    }
 
-        }
+    public void getOnceTime(JSpinner startSpinner, JSpinner endSpinner){
+        LocalDateTime spin = ((SpinnerDateModel) startSpinner.getModel()).getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        LocalDate day = spin.toLocalDate();
+        addOnceAvailability(
+                day,
+                spin.toLocalTime(),
+                ((SpinnerDateModel) endSpinner.getModel()).getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime().toLocalTime()
+        );
+    }
+
+    public void goBackToMainMenu(){
+        JMenu returnt = new JMenu("Return to main menu");
+        JMenuItem item = new JMenuItem("Click to leave");
+        returnt.add(item);
+        this.getJMenuBar().add(returnt);
+
+        item.addActionListener(f ->{
+            this.setContentPane(classScroll);
+            addClass.setVisible(true);
+            this.setResizable(true);
+            this.setSize(800, 500);
+            this.getJMenuBar().remove(returnt);
+        });
+    }
 
 
 
