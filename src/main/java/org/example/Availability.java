@@ -45,6 +45,7 @@ public class Availability { //Possible entity class
         this.reserved = false;
     }
 
+
     //Getters
     public int getId() {
         return id;

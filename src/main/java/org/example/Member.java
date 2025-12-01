@@ -26,6 +26,8 @@ public class Member  {
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<FitnessGoal> goals;
+    @ManyToMany
+    private List<Class> groupClasses;
 
     public int getNumGoals() {
         return numGoals;
@@ -91,6 +93,11 @@ public class Member  {
 
     public void addMetric(HealthMetric metric){
         this.metrics.add(metric);
+    }
+
+    public void addClass(Class groupClass){
+        groupClasses.add(groupClass);
+        groupClass.addPerson(this);
     }
 
     public boolean checkLogIn(String pass) {

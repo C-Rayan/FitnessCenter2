@@ -101,7 +101,8 @@ public class LoginView extends JFrame  {
                 checkLogin.isComplete();
                 if (userType.equals("Member")){
                     loginFrame.dispose();
-                    new ProfileView(checkMember, session);
+                    //new ProfileView(checkMember, session);
+                    new MemberBooking(session, checkMember);
                 }
                 else if (userType.equals("Trainer")){
                     System.out.println("Happening");
@@ -110,9 +111,5 @@ public class LoginView extends JFrame  {
                 }
             }
         });
-
-
-
-
     }
 }

@@ -3,6 +3,9 @@ package org.example;
 import jakarta.persistence.*;
 import org.hibernate.annotations.Type;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 public class Class {
     @Id
@@ -21,6 +24,8 @@ public class Class {
 
     @OneToOne(cascade =  CascadeType.ALL)
     private Room room;
+    @ManyToMany
+    private List<Member> participants;
 
     public String getTitle() {
         return title;
@@ -47,6 +52,12 @@ public class Class {
         this.time = availability;
         this.trainer = null;
         this.room = null;
+        participants = new ArrayList<>();
+    }
+
+    public void addPerson(Member person){
+        participants.add(person);
+        capacity--;
     }
 
     public Availability getTime() {
