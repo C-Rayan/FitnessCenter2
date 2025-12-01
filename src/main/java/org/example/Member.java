@@ -116,4 +116,11 @@ public class Member  {
     }
 
 
+    public int getId() {
+        return id;
+    }
+
+    public void setTrainer(Trainer trainer) {
+        this.trainer = trainer;
+    }
 }

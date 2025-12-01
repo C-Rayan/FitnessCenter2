@@ -79,12 +79,6 @@ public class HealthMetric {
 
     @Override
     public String toString() {
-        return "HealthMetric{" +
-                title + '\'' +
-                ", date=" + date +
-                ", height=" + height +
-                ", heartRate=" + heartRate +
-                ", weight=" + weight +
-                '}';
+        return  title +", date=" + date + ", height=" + height +", heartRate=" + heartRate + ", weight=" + weight;
     }
 }

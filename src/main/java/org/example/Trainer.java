@@ -19,7 +19,6 @@ public class Trainer {
     private int pass;
     @OneToMany
     private List<Availability> availabilities;
-    //private  List<Availability> singleAvailabilities;
     @OneToMany(mappedBy = "trainer")
     private List<Member> clients;
 
@@ -28,7 +27,7 @@ public class Trainer {
         this.name = name;
         this.pass = pass;
         availabilities = new ArrayList<>();
-        //singleAvailabilities = new ArrayList<>();
+        clients = new ArrayList<>();
     }
 
     public Trainer(){}
@@ -61,7 +60,7 @@ public class Trainer {
     public void setId(int id) {
         this.id = id;
     }
-    /*
+
     public List<Member> getClients() {
         return clients;
     }
@@ -70,7 +69,10 @@ public class Trainer {
         this.clients = clients;
     }
 
-     */
+    public void addClient(Member m){
+        m.setTrainer(this);
+        clients.add(m);
+    }
 
     public List<Availability> getAvailabilities() {
         return availabilities;
@@ -94,7 +96,4 @@ public class Trainer {
         return false;
     }
 
-    public List<Member> getClients() {
-        return clients;
-    }
 }

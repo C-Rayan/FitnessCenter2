@@ -17,8 +17,6 @@ public class TrainerSchedulerGUI extends JFrame {
     private TrainerScheduleController controller;
     private Trainer trainer;
     private JComboBox<Member> memberComboBox;
-    private JTextField searchField;
-    private JButton searchButton;
     private JTabbedPane tabbedPane;
     private JTable recurringTable;
     private JTable oneTimeTable;
@@ -29,9 +27,23 @@ public class TrainerSchedulerGUI extends JFrame {
     public TrainerSchedulerGUI(Session session, Trainer trainer) {
         controller = new TrainerScheduleController(session);
         this.trainer = trainer;
+        Member jon = new Member("hon@gmail.com", "Jon", "Male0", LocalDate.now(), 1);
+        FitnessGoal goal = new FitnessGoal("Test", 10, 12, jon);
+        HealthMetric metric = new HealthMetric("1", 180, 80,69, jon);
+
+        Member jane = new Member("ho@gmail.com", "Jane", "Male", LocalDate.now(), 1);
+        FitnessGoal goal1 = new FitnessGoal("Test", 10, 12, jane);
+        HealthMetric metric1 = new HealthMetric("1", 180, 80,69, jane);
+
+        jon.addNewGoal(goal);
+        jon.addMetric(metric);
+        jane.addNewGoal(goal1);
+        jane.addMetric(metric1);
+        trainer.addClient(jane);
+        trainer.addClient(jon);
         controller.addTrainer(trainer);
         initializeUI();
-        //loadMembers();
+        loadMembers();
         refreshTables();
     }
 
@@ -42,7 +54,7 @@ public class TrainerSchedulerGUI extends JFrame {
 
         JPanel mainPanel = new JPanel(new BorderLayout());
 
-        /*Top panel - Trainer selection ( remove)
+        //Top panel - Trainer selection ( remove)
         JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         topPanel.add(new JLabel("Select Member:"));
         memberComboBox = new JComboBox<>();
@@ -55,10 +67,6 @@ public class TrainerSchedulerGUI extends JFrame {
 
         //mainPanel.add(topPanel, BorderLayout.NORTH);
 
-         */
-        //Quick search
-        //JPanel topPanel = createTopPanel();
-        //mainPanel.add(topPanel, BorderLayout.NORTH);
 
         // Center panel - Tabs for different availability types
         tabbedPane = new JTabbedPane();
@@ -70,6 +78,9 @@ public class TrainerSchedulerGUI extends JFrame {
         // One-Time Availability Tab
         JPanel oneTimePanel = createOneTimeAvailabilityPanel();
         tabbedPane.addTab("One-Time Availability", oneTimePanel);
+
+        JPanel clientPanel = createClientPanel();
+        tabbedPane.addTab("Clients", clientPanel);
 
         mainPanel.add(tabbedPane, BorderLayout.CENTER);
 
@@ -203,29 +214,6 @@ public class TrainerSchedulerGUI extends JFrame {
         JScrollPane trainerScrollPane = new JScrollPane(clientTable);
         trainerScrollPane.setPreferredSize(new Dimension(800, 300));
 
-        // Add client form
-        JPanel addClientPanel = new JPanel(new GridLayout(2, 2, 5, 5));
-        addClientPanel.setBorder(BorderFactory.createTitledBorder("Add New Client"));
-
-        JTextField newClientName = new JTextField();
-        JTextField newClientEmail = new JTextField();
-
-        addClientPanel.add(new JLabel("Name:"));
-        addClientPanel.add(newClientName);
-        addClientPanel.add(new JLabel("Email:"));
-        addClientPanel.add(newClientEmail);
-
-        JButton addTrainerBtn = new JButton("Add Client");
-        /*
-        addTrainerBtn.addActionListener(e -> {
-            addNewClient(newClientName.getText(), newClientEmail.getText());
-            newClientName.setText("");
-            newClientEmail.setText("");
-            refreshMemberTable(clientTableModel);
-            loadMembers(); // Refresh the main combo box
-        });
-
-         */
 
         // Action listeners
         managementSearchButton.addActionListener(e -> {
@@ -244,8 +232,6 @@ public class TrainerSchedulerGUI extends JFrame {
         // Layout
         JPanel northPanel = new JPanel(new BorderLayout());
         northPanel.add(searchManagementPanel, BorderLayout.NORTH);
-        northPanel.add(addClientPanel, BorderLayout.CENTER);
-        northPanel.add(addTrainerBtn, BorderLayout.SOUTH);
 
         panel.add(northPanel, BorderLayout.NORTH);
         panel.add(trainerScrollPane, BorderLayout.CENTER);
@@ -257,13 +243,13 @@ public class TrainerSchedulerGUI extends JFrame {
     }
 
     private void loadMembers() {
-        /*
+
         List<Member> members = controller.getAllMembers(trainer.getId());
         memberComboBox.removeAllItems();
         for (Member client : members) {
             memberComboBox.addItem(client);
         }
-         */
+
         allClients = controller.getAllMembers(trainer.getId());
         updateMemberComboBox(allClients);
     }
@@ -280,7 +266,7 @@ public class TrainerSchedulerGUI extends JFrame {
         if (client != null) {
             for (int i = 0; i < memberComboBox.getItemCount(); i++) {
                 // CHANGE BACK TO .getID() LATER REMEMBER
-                if (memberComboBox.getItemAt(i).getEmail() == client.getEmail()) {
+                if (memberComboBox.getItemAt(i).getId() == client.getId()) {
                     memberComboBox.setSelectedIndex(i);
                     break;
                 }
@@ -290,35 +276,6 @@ public class TrainerSchedulerGUI extends JFrame {
         if (memberComboBox.getSelectedItem() == null && memberComboBox.getItemCount() > 0) {
             memberComboBox.setSelectedIndex(0);
         }
-    }
-
-    private void searchClients(){
-        String searchText = searchField.getText().trim().toLowerCase();
-
-        if (searchText.isEmpty()) {
-            updateMemberComboBox(allClients);
-            return;
-        }
-
-        List<Member> filteredMembers = allClients.stream()
-                .filter(member ->
-                        member.getName().toLowerCase().contains(searchText) ||
-                                member.getEmail().toLowerCase().contains(searchText))
-                .collect(Collectors.toList());
-
-        updateMemberComboBox(filteredMembers);
-
-        if (filteredMembers.isEmpty()) {
-            JOptionPane.showMessageDialog(this,
-                    "No trainers found matching: " + searchText,
-                    "Search Results",
-                    JOptionPane.INFORMATION_MESSAGE);
-        }
-    }
-
-    private  void clearSearch(){
-        searchField.setText("");
-        updateMemberComboBox(allClients);
     }
 
     private void searchAndDisplayClients(String searchText, DefaultTableModel tableModel) {
@@ -347,11 +304,10 @@ public class TrainerSchedulerGUI extends JFrame {
 
         for (Member member : members) {
             tableModel.addRow(new Object[]{
-                    // UNCOMMENT LATER
-                    //member.getId(),
+                    member.getId(),
                     member.getName(),
-                    member.getEmail(),
-                    "Delete"
+                    member.getGoals().toString(),
+                    member.getMetrics().toString()
             });
         }
     }
@@ -408,35 +364,14 @@ public class TrainerSchedulerGUI extends JFrame {
     private void addOneTimeAvailability(LocalDateTime startTime, LocalDateTime endTime) {
         try {
             LocalDate date = startTime.toLocalDate();
-            System.out.println("bi");
             controller.addIndividualAvailability(trainer.getId(), date, startTime.toLocalTime(), endTime.toLocalTime());
-            System.out.println("boo");
             refreshTables();
-            System.out.println("jon");
             JOptionPane.showMessageDialog(this, "One-time availability added successfully");
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            System.out.println(ex.getMessage());
         }
     }
 
-    /*
-    private void addNewClient(String name, String email){
-        if (name == null || name.trim().isEmpty() || email == null || email.trim().isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Name and email are required", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        try {
-            scheduleService.addTrainer(name.trim(), email.trim());
-            JOptionPane.showMessageDialog(this, "Trainer added successfully");
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-        }
-
-    }
-
-     */
 
     private void showAddClientDialog() {
         JTextField nameField = new JTextField(20);
@@ -453,7 +388,6 @@ public class TrainerSchedulerGUI extends JFrame {
 
         if (result == JOptionPane.OK_OPTION) {
             try {
-                //controller.addClient(nameField.getText(), emailField.getText());
                 loadMembers();
                 JOptionPane.showMessageDialog(this, "Client added successfully");
             } catch (Exception ex) {
@@ -473,8 +407,8 @@ public class TrainerSchedulerGUI extends JFrame {
         }
     }
     class ButtonEditor extends DefaultCellEditor {
-        private String label;
         private boolean isRecurring;
+
 
         public ButtonEditor(JCheckBox checkBox, boolean isRecurring) {
             super(checkBox);
@@ -483,7 +417,7 @@ public class TrainerSchedulerGUI extends JFrame {
 
         public Component getTableCellEditorComponent(JTable table, Object value,
                                                      boolean isSelected, int row, int column) {
-            label = (value == null) ? "" : value.toString();
+            String label = (value == null) ? "" : value.toString();
             JButton button = new JButton(label);
             button.addActionListener(e -> {
                 fireEditingStopped();
@@ -509,7 +443,7 @@ public class TrainerSchedulerGUI extends JFrame {
 
     }
 
-    /*public static void main(String[] args) {
+    public static void main(String[] args) {
         Configuration config = new Configuration();
         config.addAnnotatedClass(org.example.Member.class);
         config.addAnnotatedClass(org.example.Admin.class);
@@ -526,7 +460,7 @@ public class TrainerSchedulerGUI extends JFrame {
         Session session = sf.openSession();
         Trainer t = new Trainer("hans@gmail.com","Han", 1);
         new TrainerSchedulerGUI(session,t).setVisible(true);
-    }*/
+    }
 }
 
 

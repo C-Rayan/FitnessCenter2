@@ -86,4 +86,11 @@ public class TrainerScheduleController {
     private  Availability findRecurringById(int id){
         return session.find(Availability.class, id);
     }
+
+    public List<Member> searchClients(String name, int trainerId){
+        if(name == null || name.trim().isEmpty()){
+            return trainerRepo.findAllClients(session, trainerId);
+        }
+        return  trainerRepo.findClients(session, trainerId, name);
+    }
 }

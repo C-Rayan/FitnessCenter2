@@ -28,8 +28,22 @@ public class TrainerRepo {
         return session.createQuery(cq).getResultList();
     }
 
+    public  List<Member> findClients(Session session, int trainerId, String name){
+        CriteriaBuilder cb = session.getCriteriaBuilder();
+        CriteriaQuery<Member> cq = cb.createQuery(Member.class);
+        Root<Member> memberRoot = cq.from(Member.class);
+        cq.select(memberRoot)
+                .where(cb.and(
+                        cb.equal(memberRoot.get("trainer").get("id"), trainerId)),
+                        (cb.equal(memberRoot.get("member").get("name"),name))
+                );
+        return session.createQuery(cq).getResultList();
+    }
+
     public void save(Session session, Trainer trainer){
         Transaction transaction = session.beginTransaction();
+        for (Member m: trainer.getClients())
+            session.persist(m);
         session.persist(trainer);
         transaction.commit();
     }
