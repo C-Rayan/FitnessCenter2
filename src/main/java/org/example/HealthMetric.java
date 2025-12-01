@@ -1,39 +1,51 @@
 package org.example;
 
+import jakarta.persistence.*;
+
 import java.time.LocalDate;
 
+@Entity
 public class HealthMetric {
-    private  String email;
-    private String id;
+    @Id
+   // @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private String title;
     private LocalDate date;
     private  int height;
     private double heartRate;
     private  double weight;
 
-    public HealthMetric(String email, String id, LocalDate date, int height, double heartRate, double weight){
-        this.email = email;
-        this.id =id;
+
+    @ManyToOne
+    @EmbeddedId
+    private Member member;
+
+
+    public HealthMetric(LocalDate date, int height, double heartRate, double weight, Member member){
         this.date = date;
         this.height = height;
         this.heartRate = heartRate;
         this.weight = weight;
+        this.member = member;
     }
 
-    public String getEmail() {
-        return email;
+    public HealthMetric(String title, int height, int heartRate, int weight, Member member){
+        this.title = title;
+        this.height = height;
+        this.heartRate = heartRate;
+        this.weight = weight;
+        this.date = LocalDate.now();
+        this.member = member;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
+    public HealthMetric(){}
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
+//    public int getId() {
+//        return id;
+//    }
+//
+//    public void setId(int id) {
+//        this.id = id;
+//    }
 
     public LocalDate getDate() {
         return date;
@@ -69,7 +81,6 @@ public class HealthMetric {
 
     @Override
     public String toString() {
-        return " id='" + id + '\'' +", date=" + date + ", height=" + height
-                +", heartRate=" + heartRate +", weight=" + weight;
+        return  title +", date=" + date + ", height=" + height +", heartRate=" + heartRate + ", weight=" + weight;
     }
 }
