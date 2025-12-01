@@ -28,6 +28,14 @@ public class TrainerRepo {
         return session.createQuery(cq).getResultList();
     }
 
+    public List<Trainer> findAllTrainers(Session session){
+        CriteriaBuilder cb = session.getCriteriaBuilder();
+        CriteriaQuery<Trainer> cq = cb.createQuery(Trainer.class);
+        Root<Trainer> root = cq.from(Trainer.class);
+        cq.select(root).orderBy(cb.asc(root.get("name")));
+        return session.createQuery(cq).getResultList();
+    }
+
     public  List<Member> findClients(Session session, int trainerId, String name){
         CriteriaBuilder cb = session.getCriteriaBuilder();
         CriteriaQuery<Member> cq = cb.createQuery(Member.class);
@@ -47,6 +55,7 @@ public class TrainerRepo {
         session.persist(trainer);
         transaction.commit();
     }
+
 
     public void update(Session session, Trainer trainer){
         Transaction transaction = session.beginTransaction();
