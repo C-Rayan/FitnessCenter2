@@ -5,7 +5,9 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Date;
 
 public class Main {
@@ -21,7 +23,6 @@ public class Main {
         config.addAnnotatedClass(org.example.Class.class);
         config.addAnnotatedClass(org.example.Room.class);
         config.addAnnotatedClass(org.example.PTSession.class);
-
         config.configure("hibernate.cfg.xml");
 
         // Begin a transaction, where changes will occur in the database//
@@ -31,7 +32,10 @@ public class Main {
         new ClassView(session);
         Member p1 = new Member("bob@gmail.com", "Bob", "Male", LocalDate.now(), 1000);
         Trainer t = new Trainer("hans@gmail.com","Han", 1);
+        Availability av1 = new Availability(t, DayOfWeek.MONDAY, LocalTime.of(9, 20, 30), LocalTime.of(10, 20, 30));
+        t.getAvailabilities().add(av1);
         session.beginTransaction();
+        session.persist(av1);
         session.persist(p1); session.persist(t);
         session.getTransaction().commit();
         //HealthMetric m1 = new HealthMetric("bob@gmail.con", "1", LocalDate.now(), 150,180, 69);

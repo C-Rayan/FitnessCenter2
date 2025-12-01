@@ -28,15 +28,17 @@ public class ClassView extends JFrame {
     private Class myClass;
     private Availability newSlot;
     private JPanel classPanel;
+    private JPanel listClass;
     public ClassView(Session session){
         availabiltyRepo = new AvailabiltyRepo();
         this.myClass = myClass;
-
         this.setResizable(true);
         this.session = session;
-        classScroll = new JScrollPane();
-        this.setSize(800, 500);
 
+        listClass = new JPanel();
+        listClass.setLayout(new BoxLayout(listClass, BoxLayout.Y_AXIS));
+        classScroll = new JScrollPane(listClass);
+        this.setSize(800, 500);
         createClass = new JMenuBar();
         addClass = new JMenu();
         goToPt = new JMenu();
@@ -50,7 +52,7 @@ public class ClassView extends JFrame {
         addClass.add(addOnceOverClass);
 
         this.setJMenuBar(createClass);
-
+        refreshClassTables();
         addWeeklyClass.addActionListener(f -> {
             recurringTime = true;
             createAddClass(addClass);
@@ -65,6 +67,54 @@ public class ClassView extends JFrame {
         this.setVisible(true);
         classScroll.setVisible(true);
     }
+
+    // If there are classes on startup, addThem
+    public void refreshClassTables(){
+        List<Class> allClasses = getAllClasses();
+        for (Class allClass : allClasses) {
+            addToGui(allClass);
+        }
+    }
+
+    public void addToGui(Class newClass) {
+        JPanel classRow = new JPanel();
+        classRow.setName(String.valueOf(newClass.getCid()));
+        classRow.setLayout(new BoxLayout(classRow, BoxLayout.X_AXIS));
+        JLabel lTitle = new JLabel("Name: " + newClass.getTitle());
+        JLabel lSize = new JLabel("Capacity: " + String.valueOf(newClass.getCapacity()));
+        JButton addTrainer = new JButton("Assign a trainer to this class");
+        JButton addRoom = new JButton("Assign a room to this class");
+        classRow.add(lTitle); classRow.add(Box.createHorizontalGlue());
+        classRow.add(lSize); classRow.add(Box.createHorizontalGlue());
+        classRow.add(addTrainer); classRow.add(Box.createHorizontalGlue());
+        classRow.add(addRoom);
+        addTrainer.addActionListener(e ->{
+            int classID = Integer.parseInt(classRow.getName());
+            assignTrainer(classID);
+        });
+
+
+        listClass.add(classRow);
+    }
+
+    public void assignTrainer(int classID) {
+        try{
+            // Need to get all the trainer's availability slots
+            Class checkClass = session.find(Class.class, classID);
+            List<Availability> AVT = getALlTrainsAvails();
+            /* Go thru all the trainers availabilities
+             */
+            for (Availability avt : AVT){
+                if (avt.isWithin(checkClass.getTime())){
+                    System.out.println(avt.getTrainer().getName());
+                }
+            }
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
 
     public void createAddClass(JMenu addclass){
         this.setSize(400, 400);
@@ -110,7 +160,6 @@ public class ClassView extends JFrame {
         }
         else {
             try {
-                System.out.println("Something happened maybe?");
                     // This will still update the PK, even if it didn't add
                     Class newClass = new Class(title.getText().trim(), Integer.parseInt(size.getText().trim()), newSlot);
                     session.beginTransaction();
@@ -121,6 +170,7 @@ public class ClassView extends JFrame {
                     size.setText("Enter size");
                     size.setOpaque(false);
                     JOptionPane.showMessageDialog(this, "This class has been succesfully created!");
+                    addToGui(newClass);
                 } catch (org.hibernate.exception.ConstraintViolationException s) {
                     // Couldn't persist it since its not unique, so revert to previous state
                     session.getTransaction().rollback();
@@ -213,7 +263,12 @@ public class ClassView extends JFrame {
             CriteriaQuery<Availability> cq = cb.createQuery(Availability.class);
             Root<Availability> root = cq.from(Availability.class);
             // Gets all rows with the same days and sorts them by start time
-            cq.where(cb.equal(root.get("day"), day));
+            cq.where(
+                    cb.and(
+                            cb.equal(root.get("day"), day),
+                            cb.isNull(root.get("trainer"))
+                    )
+            );
             cq.orderBy(cb.asc(root.get("startTime")));
 
             return session.createQuery(cq).getResultList();
@@ -224,7 +279,12 @@ public class ClassView extends JFrame {
         CriteriaQuery<Availability> cq = cb.createQuery(Availability.class);
         Root<Availability> root = cq.from(Availability.class);
         // Gets all rows with the same days and sorts them by start time
-        cq.where(cb.equal(root.get("date"), date));
+        cq.where(
+                cb.and(
+                        cb.equal(root.get("date"), date),
+                        cb.isNull(root.get("trainer"))
+                )
+        );
         cq.orderBy(cb.asc(root.get("startTime")));
 
         return session.createQuery(cq).getResultList();
@@ -261,6 +321,24 @@ public class ClassView extends JFrame {
                 ((SpinnerDateModel) endSpinner.getModel()).getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime().toLocalTime()
         );
     }
+
+
+    public List<Class> getAllClasses(){
+        CriteriaBuilder cb = session.getCriteriaBuilder();
+        CriteriaQuery<Class> cq = cb.createQuery(Class.class);
+        Root<Class> root = cq.from(Class.class);
+        return session.createQuery(cq).getResultList();
+    }
+
+    public List<Availability> getALlTrainsAvails(){
+        CriteriaBuilder cb = session.getCriteriaBuilder();
+        CriteriaQuery<Availability> cq = cb.createQuery(Availability.class);
+        Root<Availability> root = cq.from(Availability.class);
+        // SELECT from all availabilities WHERE trainer_id is set
+        cq.select(root).where(cb.isNotNull(root.get("trainer")));
+        return session.createQuery(cq).getResultList();
+    }
+
 
     public void goBackToMainMenu(){
         JMenu returnt = new JMenu("Return to main menu");

@@ -93,4 +93,9 @@ public class Availability { //Possible entity class
     public DayOfWeek getDay() {
         return day;
     }
+
+    public boolean isWithin(Availability aClass){
+        // Checks if the class interval is inside the trainer's allowed time
+        return (!aClass.startTime.isBefore(startTime) && !aClass.endTime.isAfter(endTime));
+    }
 }
