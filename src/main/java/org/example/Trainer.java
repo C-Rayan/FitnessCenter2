@@ -84,10 +84,8 @@ public class Trainer {
 
     @Override
     public String toString() {
-        return "Trainer{" +
-                "name='" + name + '\'' +
-                ", email='" + email + '\'' +
-                '}';
+        return "name='" + name + '\'' +
+                ", email='" + email;
     }
 
     public boolean checkLogIn(String pass) {

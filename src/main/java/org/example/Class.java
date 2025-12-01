@@ -19,6 +19,9 @@ public class Class {
     @OneToOne(cascade = CascadeType.ALL)
     private Trainer trainer;
 
+    @OneToOne(cascade =  CascadeType.ALL)
+    private Room room;
+
     public String getTitle() {
         return title;
     }
@@ -38,14 +41,12 @@ public class Class {
         this.capacity = capacity;
     }
 
-    @OneToOne
-    private Room cRoom;
-
     public Class(String title, int capacity, Availability availability){
         this.title = title;
         this.capacity = capacity;
         this.time = availability;
         this.trainer = null;
+        this.room = null;
     }
 
     public Availability getTime() {
@@ -62,5 +63,13 @@ public class Class {
 
     public void setTrainer(Trainer trainer) {
         this.trainer = trainer;
+    }
+
+    public Room getRoom() {
+        return room;
+    }
+
+    public void setRoom(Room room) {
+        this.room = room;
     }
 }

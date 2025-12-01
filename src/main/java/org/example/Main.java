@@ -38,8 +38,10 @@ public class Main {
         Admin a2 = new Admin("Will@wiz.com", "Will", 2003);
 
         Availability av1 = new Availability(t1, DayOfWeek.MONDAY, LocalTime.of(9, 20, 30), LocalTime.of(10, 20, 30));
+        Room r1 = new Room(40);
         t1.getAvailabilities().add(av1);
         session.beginTransaction();
+        session.persist(r1);
         session.persist(av1);
         session.persist(p1); session.persist(p2);
         session.persist(t1); session.persist(t2);
