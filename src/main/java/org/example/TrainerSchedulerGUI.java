@@ -28,19 +28,19 @@ public class TrainerSchedulerGUI extends JFrame {
         controller = new TrainerScheduleController(session);
         this.trainer = trainer;
         Member jon = new Member("hon@gmail.com", "Jon", "Male0", LocalDate.now(), 1);
-        FitnessGoal goal = new FitnessGoal("Test", 10, 12, jon);
-        HealthMetric metric = new HealthMetric("1", 180, 80,69, jon);
+        //FitnessGoal goal = new FitnessGoal("Test", 10, 12, jon);
+        //HealthMetric metric = new HealthMetric("1", 180, 80,69, jon);
 
-        Member jane = new Member("ho@gmail.com", "Jane", "Male", LocalDate.now(), 1);
-        FitnessGoal goal1 = new FitnessGoal("Test", 10, 12, jane);
-        HealthMetric metric1 = new HealthMetric("1", 180, 80,69, jane);
+        //Member jane = new Member("ho@gmail.com", "Jane", "Male", LocalDate.now(), 1);
+        //FitnessGoal goal1 = new FitnessGoal("Test", 10, 12, jane);
+        //HealthMetric metric1 = new HealthMetric("1", 180, 80,69, jane);
 
-        jon.addNewGoal(goal);
-        jon.addMetric(metric);
-        jane.addNewGoal(goal1);
-        jane.addMetric(metric1);
-        trainer.addClient(jane);
-        trainer.addClient(jon);
+        //jon.addNewGoal(goal);
+        //jon.addMetric(metric);
+        //jane.addNewGoal(goal1);
+        //jane.addMetric(metric1);
+        //trainer.addClient(jane);
+        //trainer.addClient(jon);
         controller.addTrainer(trainer);
         initializeUI();
         loadMembers();
@@ -443,6 +443,7 @@ public class TrainerSchedulerGUI extends JFrame {
 
     }
 
+    /*
     public static void main(String[] args) {
         Configuration config = new Configuration();
         config.addAnnotatedClass(org.example.Member.class);
@@ -461,6 +462,8 @@ public class TrainerSchedulerGUI extends JFrame {
         Trainer t = new Trainer("hans@gmail.com","Han", 1);
         new TrainerSchedulerGUI(session,t).setVisible(true);
     }
+
+     */
 }
 
 

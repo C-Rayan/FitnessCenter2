@@ -8,7 +8,7 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 import java.util.List;
-//Putting all the methods needed in one place
+//Putting all the database trainer methods
 public class TrainerRepo {
     public Trainer findById(Session session, int id){
         return  session.find(Trainer.class, id);
