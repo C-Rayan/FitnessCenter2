@@ -11,7 +11,6 @@ import java.util.List;
 @Entity
 @Table(indexes = @Index(name = "idx_mememail", columnList = "email"))
 
-@View(query = "Select * From member")
 public class Member  {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
