@@ -26,7 +26,7 @@ public class LoginView extends JFrame  {
         JLabel nameLabel = new JLabel();
         nameLabel.setText("Please enter your email below");
         JLabel passLabel = new JLabel();
-        passLabel.setText("Please enter your 4-digit pin below");
+        passLabel.setText("Please enter your  pin below");
 
         JButton registerButton = new JButton();
         JButton loginButton = new JButton();
