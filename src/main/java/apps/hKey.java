@@ -1,4 +1,4 @@
-package org.example;
+package apps;
 
 import jakarta.persistence.Embeddable;
 

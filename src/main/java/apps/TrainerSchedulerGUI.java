@@ -1,8 +1,9 @@
-package org.example;
+package apps;
 
+import models.Availability;
+import models.Member;
+import models.Trainer;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.cfg.Configuration;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -446,12 +447,12 @@ public class TrainerSchedulerGUI extends JFrame {
     /*
     public static void main(String[] args) {
         Configuration config = new Configuration();
-        config.addAnnotatedClass(org.example.Member.class);
-        config.addAnnotatedClass(org.example.Admin.class);
-        config.addAnnotatedClass(org.example.Trainer.class);
-        config.addAnnotatedClass(org.example.Availability.class);
-        config.addAnnotatedClass(org.example.FitnessGoal.class);
-        config.addAnnotatedClass(org.example.HealthMetric.class);
+        config.addAnnotatedClass(models.Member.class);
+        config.addAnnotatedClass(models.Admin.class);
+        config.addAnnotatedClass(models.Trainer.class);
+        config.addAnnotatedClass(models.Availability.class);
+        config.addAnnotatedClass(models.FitnessGoal.class);
+        config.addAnnotatedClass(models.HealthMetric.class);
 
         config.configure("hibernate.cfg.xml");
 

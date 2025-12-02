@@ -1,28 +1,24 @@
-package org.example;
+package apps;
 
+import models.*;
+import models.Class;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
-
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.Date;
 
 public class Main {
     public static void main(String[] args){
         Configuration config = new Configuration();
         // Add all the entity classes
-        config.addAnnotatedClass(org.example.Member.class);
-        config.addAnnotatedClass(org.example.Admin.class);
-        config.addAnnotatedClass(org.example.Trainer.class);
-        config.addAnnotatedClass(org.example.HealthMetric.class);
-        config.addAnnotatedClass(org.example.FitnessGoal.class);
-        config.addAnnotatedClass(org.example.Availability.class);
-        config.addAnnotatedClass(org.example.Class.class);
-        config.addAnnotatedClass(org.example.Room.class);
-        config.addAnnotatedClass(org.example.PTSession.class);
+        config.addAnnotatedClass(Member.class);
+        config.addAnnotatedClass(Admin.class);
+        config.addAnnotatedClass(Trainer.class);
+        config.addAnnotatedClass(HealthMetric.class);
+        config.addAnnotatedClass(FitnessGoal.class);
+        config.addAnnotatedClass(Availability.class);
+        config.addAnnotatedClass(Class.class);
+        config.addAnnotatedClass(Room.class);
+        config.addAnnotatedClass(PTSession.class);
         config.configure("hibernate.cfg.xml");
 
         // Begin a transaction, where changes will occur in the database//

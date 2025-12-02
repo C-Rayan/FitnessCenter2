@@ -1,21 +1,15 @@
-package org.example;
+package apps;
 
+import models.Member;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
-import javax.crypto.spec.RC2ParameterSpec;
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.regex.Pattern;
 
 
 // A child of JPanel, so that it can be added to the main frame

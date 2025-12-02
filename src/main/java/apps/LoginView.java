@@ -1,8 +1,10 @@
-package org.example;
+package apps;
 
+import models.Admin;
+import models.Member;
+import models.Trainer;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.annotations.View;
 
 import javax.swing.*;
 import java.awt.*;

@@ -1,7 +1,6 @@
-package org.example;
+package models;
 
 import jakarta.persistence.*;
-import org.hibernate.annotations.Synchronize;
 import org.hibernate.annotations.View;
 
 import java.time.LocalDate;

@@ -1,7 +1,6 @@
-package org.example;
+package models;
 
 import jakarta.persistence.*;
-import org.hibernate.annotations.CompositeType;
 
 @Entity
 public class FitnessGoal {

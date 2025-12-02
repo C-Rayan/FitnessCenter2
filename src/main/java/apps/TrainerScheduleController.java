@@ -1,5 +1,8 @@
-package org.example;
+package apps;
 
+import models.Availability;
+import models.Member;
+import models.Trainer;
 import org.hibernate.Session;
 
 import java.time.*;

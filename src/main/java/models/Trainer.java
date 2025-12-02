@@ -1,4 +1,4 @@
-package org.example;
+package models;
 
 import jakarta.persistence.*;
 import jakarta.persistence.Index;

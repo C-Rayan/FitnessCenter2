@@ -1,5 +1,8 @@
-package org.example;
+package apps;
 
+import models.FitnessGoal;
+import models.HealthMetric;
+import models.Member;
 import org.hibernate.Session;
 
 import javax.swing.*;

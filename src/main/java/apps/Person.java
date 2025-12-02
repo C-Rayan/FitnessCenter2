@@ -1,4 +1,4 @@
-package org.example;
+package apps;
 
 public class Person {
     private String email;
