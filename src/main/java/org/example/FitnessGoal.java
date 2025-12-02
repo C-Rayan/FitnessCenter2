@@ -12,6 +12,23 @@ public class FitnessGoal {
     private double curr;
     private double newer;
 
+    public FitnessGoal(){}
+    public double getCurr() {
+        return curr;
+    }
+
+    public double getNewer() {
+        return newer;
+    }
+
+    public void setNewer(double newer) {
+        this.newer = newer;
+    }
+
+    public void setCurr(double curr) {
+        this.curr = curr;
+    }
+
     // Needs each member's ID added as another PK column, to create a composite key
     @ManyToOne
     @EmbeddedId
@@ -43,8 +60,8 @@ public class FitnessGoal {
 
     @Override
     public String toString() {
-        return "Title='" + title + '\'' +
-                ", Current=" + curr +
+        return title + '\'' +
+                ", Now=" + curr +
                 ", Goal=" + newer +
                 ", Progress=" + progress;
     }

@@ -2,14 +2,10 @@ package org.example;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.annotations.View;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.util.ArrayList;
 
 public class LoginView extends JFrame  {
     JFrame loginFrame;
@@ -105,7 +101,7 @@ public class LoginView extends JFrame  {
                 checkLogin.isComplete();
                 if (userType.equals("Member")){
                     loginFrame.dispose();
-                    new MemberBooking(session, checkMember);
+                    new ProfileView(checkMember,session);
                 }
                 else if (userType.equals("Trainer")){
                     loginFrame.dispose();

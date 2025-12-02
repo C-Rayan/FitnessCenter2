@@ -25,7 +25,7 @@ public class Class {
 
     @OneToOne(cascade =  CascadeType.ALL)
     private Room room;
-    @ManyToMany
+    @ManyToMany(mappedBy = "groupClasses")
     private List<Member> participants;
 
     public String getTitle() {
@@ -89,5 +89,12 @@ public class Class {
     public Object[] getObj(){
         Object[] object = {title, trainer != null ? this.getTrainer().getName() : "Unknown" , getTime().getdate(), getTime().getStartTime(), getTime().getEndTime()};
         return object;
+    }
+
+    @Override
+    public String toString() {
+        return "Title='" + title + '\'' +
+                " | Date=" + time.getdate() + " | Start:" + time.getStartTime() +
+                " | Trainer=" + (trainer != null?trainer.getName() : "Undecided");
     }
 }

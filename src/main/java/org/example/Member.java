@@ -1,6 +1,8 @@
 package org.example;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.Synchronize;
+import org.hibernate.annotations.View;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -8,6 +10,8 @@ import java.util.List;
 
 @Entity
 @Table(indexes = @Index(name = "idx_mememail", columnList = "email"))
+
+@View(query = "Select * From member")
 public class Member  {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,10 +30,20 @@ public class Member  {
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<HealthMetric> metrics;
 
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    // Orphan removal deletes the child without having to explicitly call the needed method
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FitnessGoal> goals;
-    @ManyToMany
+
+    @ManyToMany()
     private List<Class> groupClasses;
+
+    public List<Class> getGroupClasses() {
+        return groupClasses;
+    }
+
+    public void setGroupClasses(List<Class> groupClasses) {
+        this.groupClasses = groupClasses;
+    }
 
     public int getNumGoals() {
         return numGoals;

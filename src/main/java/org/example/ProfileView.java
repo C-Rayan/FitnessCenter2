@@ -4,6 +4,7 @@ import org.hibernate.Session;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
@@ -20,6 +21,8 @@ public class ProfileView extends  JFrame {
     private JPanel ProfilePanel;
     private JScrollPane goalScrollPane;
     private JScrollPane metricScrollPane;
+    private JLabel classLbl;
+    private JScrollPane classPane;
 
     public ProfileView(Member p, Session session){
         setContentPane(ProfilePanel);
@@ -35,21 +38,101 @@ public class ProfileView extends  JFrame {
 
 
         //Goals and current health metrics
-        //DefaultListModel<String> listModel = new DefaultListModel<>();
-        JList<Object> goalList = new JList<>(p.getGoals().toArray());
+        DefaultListModel<Object> listModel = new DefaultListModel<>();
+        listModel.addAll(p.getGoals());
+        JList<Object> goalList = new JList<>(listModel);
         JList<Object> metricList = new JList<>(p.getMetrics().toArray());
         goalScrollPane.setViewportView(goalList);
         metricScrollPane.setViewportView(metricList);
+
+        DefaultListModel<Object> list = new DefaultListModel<>();
+        list.addAll(p.getGroupClasses());
+        JList<Object> classList = new JList<>(list);
+        classPane.setViewportView(classList);
+
         metricScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         metricScrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
         metricList.ensureIndexIsVisible(p.getMetrics().size() - 1);
 
+        classList.addMouseListener(new MouseAdapter() {
+            @Override
+            // Simply click to remove a class
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+                int index = classList.getSelectedIndex();
+                if (index != -1){
+                    session.beginTransaction();
+                    p.getGroupClasses().get(index).setCapacity((p.getGroupClasses().get(index).getCapacity())+1);
+                    p.getGroupClasses().remove(index);
+                    session.getTransaction().commit();
+                    list.remove(index);
+                }
+            }
+        });
+
+        goalList.addMouseListener(new MouseAdapter() {
+            @Override
+            // Simply click to remove a class
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+                int index = goalList.getSelectedIndex();
+                if (index != -1){
+                    try{
+                        int newCurr = Integer.parseInt(JOptionPane.showInputDialog(null, "Enter your new progress", "FitnessGoal", JOptionPane.PLAIN_MESSAGE));
+                        // Enter a progress in 0 and 100, and it will update the values accordingly
+                        if (newCurr >= 0 && newCurr < 100){
+                            session.beginTransaction();
+                            FitnessGoal goal = p.getGoals().get(index);
+                            goal.setProgress(newCurr);
+                            goal.setCurr((goal.getNewer() - goal.getCurr())*(goal.getProgress()/100) + goal.getCurr());
+                            session.getTransaction().commit();
+                            // Set a new goal at the previous index
+                            System.out.println(listModel.size());
+                            System.out.println(p.getGoals().size());
+                            listModel.set(index, goal);
+                        }
+                        // The goal has been accomplished! Let's delete it
+                        else if (newCurr == 100){
+                            session.beginTransaction();
+                            p.getGoals().remove(index);
+                            listModel.remove(index);
+                            session.getTransaction().commit();
+                        }
+                        else {
+                            JOptionPane.showMessageDialog(null, "Please keep it between 0 and 100");
+                        }
+                    }
+                    catch(NumberFormatException n){
+                        JOptionPane.showMessageDialog(null, "Please enter a numeric value");
+                    }
+                }
+
+//                session.beginTransaction();
+//                p.getGroupClasses().get(index).setCapacity((p.getGroupClasses().get(index).getCapacity())+1);
+//                p.getGroupClasses().remove(index);
+//                session.getTransaction().commit();
+//                list.remove(index);
+
+            }
+        });
 
         JMenuBar options = new JMenuBar();
         this.setJMenuBar(options);
         JMenu changeDetail = new JMenu("Update Personal Details");
         JMenu Metrics = new JMenu("Update Health Metrics");
         JMenu goals = new JMenu("Update Fitness Goals");
+        JMenu addClasses = new JMenu("Switch to class modification");
+        options.add(addClasses);
+        JFrame frame = this;
+        addClasses.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+                frame.setVisible(false);
+                new MemberBooking(session, p);
+            }
+        });
+
 
         // Create personal data that needs to be changed, only name and gender
         JMenuItem name = new JMenuItem();
@@ -295,4 +378,5 @@ public class ProfileView extends  JFrame {
 
         setVisible(true);
     }
+
 }
